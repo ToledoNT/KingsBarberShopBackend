@@ -18,17 +18,14 @@ export class CreateUserController {
       return;
     }
 
-    // Criptografa a senha
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Cria payload usando model
     const payload: ICreateUser = new CreateUserModel({
       name,
       email,
       password: hashedPassword
     }).toPayload();
 
-    // Executa use-case
     const createdUserResult = await new CreateUser().execute(payload);
 
     res.status(createdUserResult.code).json(createdUserResult);

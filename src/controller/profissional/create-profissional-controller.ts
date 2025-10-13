@@ -27,6 +27,18 @@ export class CreateProfessionalController {
     const useCase = new CreateProfissionalUseCase();
     const createdProfessionalResult = await useCase.execute(payload);
 
+    if (createdProfessionalResult.status && createdProfessionalResult.data) {
+      const { id, nome, email, telefone, criadoEm, atualizadoEm } = createdProfessionalResult.data;
+      createdProfessionalResult.data = {
+        id,
+        name: nome, 
+        email,
+        telefone,
+        createdAt: criadoEm,   
+        updatedAt: atualizadoEm,
+      };
+    }
+
     res.status(createdProfessionalResult.code).json(createdProfessionalResult);
   }
 }

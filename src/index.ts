@@ -4,9 +4,8 @@ dotenv.config();
 
 
 const PORT = 4001;
-const HOST = "0.0.0.0";
 
-server.listen(PORT, HOST, () => {
+server.listen(PORT, () => {
   console.clear();
-  console.log(`--Server ON--`);
+  console.log(`--Server ON-- http://localhost:${PORT}`);
 });

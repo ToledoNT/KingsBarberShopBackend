@@ -1,4 +1,4 @@
-import { ICreateProfessional } from "interface/profissional/create-profissional";
+import { ICreateProfessional } from "../../interface/profissional/create-profissional";
 
 export class CreateProfessionalModel {
   nome: string;

@@ -8,36 +8,36 @@ datasource db {
 }
 
 model Profissional {
-  id               String       @id @default(auto()) @map("_id") @db.ObjectId
-  nome             String
-  email            String
-  telefone         String
-  criadoEm         DateTime     @default(now())
-  atualizadoEm     DateTime     @updatedAt
-  procedimentos    Procedimento[]
-  agendamentos     Agendamento[]
+  id                 String             @id @default(auto()) @map("_id") @db.ObjectId
+  nome               String
+  email              String
+  telefone           String
+  criadoEm           DateTime           @default(now())
+  atualizadoEm       DateTime           @updatedAt
+  procedimentos      Procedimento[]
+  agendamentos       Agendamento[]
   horariosDisponiveis HorarioDisponivel[]
 }
 
 model Procedimento {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  nome      String
-  preco     Float
-  criadoEm  DateTime     @default(now())
-  atualizadoEm DateTime   @updatedAt
-  profissionalId String?  @db.ObjectId
-  profissional Profissional? @relation(fields: [profissionalId], references: [id])
-  agendamentos Agendamento[] 
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  nome            String
+  valor           Float
+  criadoEm        DateTime      @default(now())
+  atualizadoEm    DateTime      @updatedAt
+  profissionalId  String?       @db.ObjectId
+  profissional    Profissional? @relation(fields: [profissionalId], references: [id])
+  agendamentos    Agendamento[]
 }
 
 model HorarioDisponivel {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  barbeiroId String      @db.ObjectId
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  barbeiroId String       @db.ObjectId
   barbeiro   Profissional @relation(fields: [barbeiroId], references: [id])
-  data      DateTime
-  inicio    String
-  fim       String
-  criadoEm  DateTime     @default(now())
+  data       DateTime
+  inicio     String
+  fim        String
+  criadoEm   DateTime     @default(now())
   atualizadoEm DateTime   @updatedAt
 }
 
@@ -58,11 +58,11 @@ model Agendamento {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  email     String   @unique
-  password  String
-  criadoEm  DateTime @default(now())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String   @unique
+  password    String
+  criadoEm    DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 }
 

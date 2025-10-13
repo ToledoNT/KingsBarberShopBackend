@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 export class ProfessionalMiddleware {
   handleCreateProfessional(req: Request, res: Response, next: NextFunction): void {
     const { nome, email, telefone } = req.body;
+    console.log(nome, email , telefone)
 
     if (!nome || !email || !telefone) {
       res.status(400).json({

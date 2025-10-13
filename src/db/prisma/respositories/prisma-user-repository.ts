@@ -1,6 +1,6 @@
 import { prisma } from "../prisma-connection";
-import { ICreateUser } from "../../../interface/user/create-user-interface"
-import { ResponseTemplateModel } from "../../../model/response-templete-model"
+import { ICreateUser } from "../../../interface/user/create-user-interface";
+import { ResponseTemplateModel } from "../../../model/response-templete-model";
 import { ResponseTemplateInterface } from "../../../interface/response-template-interface";
 
 export class PrismaUserRepository {
@@ -23,6 +23,23 @@ export class PrismaUserRepository {
       }
 
       return new ResponseTemplateModel(false, 500, "Erro interno ao criar usuário", []);
+    }
+  }
+
+  async getByEmail(email: string): Promise<ResponseTemplateInterface> {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (!user) {
+        return new ResponseTemplateModel(false, 404, "Usuário não encontrado", []);
+      }
+
+      return new ResponseTemplateModel(true, 200, "Usuário encontrado com sucesso", user);
+    } catch (error: any) {
+      console.error("Erro ao buscar usuário:", error);
+      return new ResponseTemplateModel(false, 500, "Erro interno ao buscar usuário", []);
     }
   }
 }

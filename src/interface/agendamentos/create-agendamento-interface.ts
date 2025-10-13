@@ -1,5 +1,3 @@
-// interfaces/appointments/appointment-interface.ts
-
 export enum StatusAgendamento {
   PENDENTE = "Pendente",
   CONCLUIDO = "Concluído",

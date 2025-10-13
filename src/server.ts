@@ -1,20 +1,21 @@
-import express, { type Request, Response } from "express";
+import express, { Request, Response } from "express";
+import cors from "cors";
 import UserRoute from "./router/user-route";
 import ProfissionalRoute from "./router/profissional-route";
 import AgendamentoRoute from "./router/agendamentos-admin-route";
-// import HorarioRoute from "./router/horarios-route";
+import ProcedimentoRoute from "./router/procedimentos-route";
 
 const server = express();
 
+server.use(cors({ origin: "http://localhost:3000" }));
+
 server.use(express.json());
 
-// Rotas da API
-server.use("/api/users", UserRoute);
-server.use("/api/profissionais", ProfissionalRoute);
-server.use("/api/agendamentos", AgendamentoRoute);
-// server.use("/api/horarios", HorarioRoute);
+server.use("/api", UserRoute);
+server.use("/api", ProfissionalRoute);
+server.use("/api", AgendamentoRoute);
+server.use("/api", ProcedimentoRoute); 
 
-// Rota raiz
 server.get("/", (req: Request, res: Response) => {
   res.send("🔥 Servidor rodando e rotas carregadas com sucesso!");
 });
