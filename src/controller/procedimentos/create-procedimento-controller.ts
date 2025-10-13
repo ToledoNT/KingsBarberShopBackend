@@ -19,7 +19,6 @@ export class CreateProcedimentoController {
     const payload: ICreateProcedimento = { nome, valor, profissionalId };
 
     const createdProcedimentoResult = await new CreateProcedimentoUseCase().execute(payload);
-    console.log(createdProcedimentoResult)
 
     res.status(createdProcedimentoResult.code).json(createdProcedimentoResult);
   }

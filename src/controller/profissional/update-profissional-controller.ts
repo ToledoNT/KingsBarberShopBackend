@@ -26,7 +26,6 @@ export class UpdateProfessionalController {
 
     const updateUseCase = new UpdateProfissionalUseCase();
     const updatedProfessionalResult = await updateUseCase.execute(payload);
-    console.log(updatedProfessionalResult)
 
     res.status(updatedProfessionalResult.code).json(updatedProfessionalResult);
   }

@@ -18,22 +18,54 @@ export class ProcedimentoMiddleware {
     next();
   }
 
-  handleUpdateProcedimento(req: Request, res: Response, next: NextFunction): void {
-    const { id } = req.params;
-    const { nome, preco, profissionalId } = req.body;
-
-    if (!id || !nome || preco === undefined || !profissionalId) {
-      res.status(400).json({
-        status: false,
-        code: 400,
-        message: "ID, nome, preço e profissionalId são obrigatórios para atualizar um procedimento.",
-        data: [],
-      });
-      return;
-    }
-
-    next();
+ handleUpdateProcedimento(req: Request, res: Response, next: NextFunction): void {
+  const { id } = req.params;
+  const { nome, valor, profissionalId } = req.body; 
+  if (!id || typeof id !== "string" || id.trim() === "") {
+    res.status(400).json({
+      status: false,
+      code: 400,
+      message: "ID é obrigatório e deve ser uma string válida.",
+      data: [],
+    });
+    return;
   }
+
+  if (!nome || typeof nome !== "string" || nome.trim() === "") {
+    res.status(400).json({
+      status: false,
+      code: 400,
+      message: "Nome é obrigatório e não pode ser vazio.",
+      data: [],
+    });
+    return;
+  }
+
+  const precoNumero = Number(valor); 
+  if (isNaN(precoNumero) || precoNumero < 0) {
+    res.status(400).json({
+      status: false,
+      code: 400,
+      message: "Preço é obrigatório e deve ser um número maior ou igual a 0.",
+      data: [],
+    });
+    return;
+  }
+
+  if (!profissionalId || typeof profissionalId !== "string" || profissionalId.trim() === "") {
+    res.status(400).json({
+      status: false,
+      code: 400,
+      message: "profissionalId é obrigatório e deve ser uma string válida.",
+      data: [],
+    });
+    return;
+  }
+
+  req.body.preco = precoNumero;
+
+  next();
+}
 
   handleDeleteProcedimento(req: Request, res: Response, next: NextFunction): void {
     const { id } = req.params;
