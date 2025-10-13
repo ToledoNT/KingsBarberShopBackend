@@ -1,7 +1,7 @@
 import { StatusAgendamento } from "./create-agendamento-interface";
 
 export interface IUpdateAppointment {
-  id: string; // obrigatório
+  id: string; 
   nome?: string;
   telefone?: string;
   email?: string;

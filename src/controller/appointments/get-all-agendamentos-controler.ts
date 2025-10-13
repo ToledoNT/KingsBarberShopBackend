@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { GetAllAppointmentsUseCase } from "use-case/agendamento/get-all-agendamento-use-case";
+import { GetAllAppointmentsUseCase } from "../../use-case/agendamento/get-all-agendamento-use-case";
 
 export class GetAllAppointmentsController {
   async handle(req: Request, res: Response): Promise<void> {

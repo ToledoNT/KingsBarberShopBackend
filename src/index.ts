@@ -1,16 +1,12 @@
 import dotenv from "dotenv";
+import server from "./server";
 dotenv.config();
 
-import { server } from "./server";
 
-const PORT = Number(process.env.PORT) || 4001;
-const HOST = "localhost"; 
+const PORT = 4001;
+const HOST = "0.0.0.0";
 
-try {
-  server.listen(PORT, HOST, () => {
-    console.clear();
-    console.log(`🚀 Server running at http://${HOST}:${PORT}`);
-  });
-} catch (err) {
-  console.error("❌ Erro ao iniciar o servidor:", err);
-}
+server.listen(PORT, HOST, () => {
+  console.clear();
+  console.log(`--Server ON--`);
+});

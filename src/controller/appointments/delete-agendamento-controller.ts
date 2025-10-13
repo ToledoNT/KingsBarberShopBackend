@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { DeleteAppointmentUseCase } from "use-case/agendamento/delete-agendamento-use-case";
+import { DeleteAppointmentUseCase } from "../../use-case/agendamento/delete-agendamento-use-case";
 
 export class DeleteAppointmentController {
   async handle(req: Request, res: Response): Promise<void> {

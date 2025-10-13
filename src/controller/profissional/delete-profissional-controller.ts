@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
-import { DeleteProfissionalUseCase } from "use-case/profissional/delete-profissional-usse-case";
-
+import { DeleteProfissionalUseCase } from "../../use-case/profissional/delete-profissional-usse-case";
 export class DeleteProfessionalController {
   async handle(req: Request, res: Response): Promise<void> {
     const { id } = req.body;

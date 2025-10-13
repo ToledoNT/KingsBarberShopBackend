@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import { IUpdateAppointment } from "interface/agendamentos/update-agendamento-interface";
-import { UpdateAppointmentUseCase } from "use-case/agendamento/update-agendamento-use-case";
+import { IUpdateAppointment } from "../../interface/agendamentos/update-agendamento-interface";
+import { UpdateAppointmentUseCase } from "../../use-case/agendamento/update-agendamento-use-case";
 
 export class UpdateAppointmentController {
   async handle(req: Request, res: Response): Promise<void> {

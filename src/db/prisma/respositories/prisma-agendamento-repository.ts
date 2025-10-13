@@ -1,21 +1,21 @@
-import { ResponseTemplateInterface } from "interface/response-template-interface.js";
 import { prisma } from "../prisma-connection";
-import { ResponseTemplateModel } from "model/response-templete-model.js";
-import { ICreateAppointment } from "interface/agendamentos/create-agendamento-interface";
-import { IUpdateAppointment } from "interface/agendamentos/update-agendamento-interface";
+import { ICreateAppointment } from "../../../interface/agendamentos/create-agendamento-interface";
+import { IUpdateAppointment } from "../../../interface/agendamentos/update-agendamento-interface";
+import { ResponseTemplateInterface } from "../../../interface/response-template-interface";
+import { ResponseTemplateModel } from "../../../model/response-templete-model";
 
 export class PrismaAppointmentRepository {
   async create(data: ICreateAppointment): Promise<ResponseTemplateInterface> {
     try {
-      const appointment = await prisma.appointment.create({
+      const appointment = await prisma.agendamento.create({
         data: {
           nome: data.nome,
           telefone: data.telefone,
           email: data.email,
           data: data.data,
           hora: data.hora,
-          servico: data.servico,
-          profissional: data.profissional, // alterado de barbeiro para profissional
+          servicoId: data.servico,       
+          barbeiroId: data.profissional, 
           status: data.status || "Pendente",
         },
       });
@@ -35,11 +35,11 @@ export class PrismaAppointmentRepository {
       if (data.email !== undefined) updateData.email = data.email;
       if (data.data !== undefined) updateData.data = data.data;
       if (data.hora !== undefined) updateData.hora = data.hora;
-      if (data.servico !== undefined) updateData.servico = data.servico;
-      if (data.profissional !== undefined) updateData.profissional = data.profissional; // alterado
+      if (data.servico !== undefined) updateData.servicoId = data.servico;
+      if (data.profissional !== undefined) updateData.barbeiroId = data.profissional;
       if (data.status !== undefined) updateData.status = data.status;
 
-      const updatedAppointment = await prisma.appointment.update({
+      const updatedAppointment = await prisma.agendamento.update({
         where: { id: data.id },
         data: updateData,
       });
@@ -58,17 +58,13 @@ export class PrismaAppointmentRepository {
 
   async deleteById(id: string): Promise<ResponseTemplateInterface> {
     try {
-      const appointmentExists = await prisma.appointment.findUnique({
-        where: { id }
-      });
+      const appointmentExists = await prisma.agendamento.findUnique({ where: { id } });
 
       if (!appointmentExists) {
         return new ResponseTemplateModel(false, 404, "Agendamento não encontrado", []);
       }
 
-      await prisma.appointment.delete({
-        where: { id }
-      });
+      await prisma.agendamento.delete({ where: { id } });
 
       return new ResponseTemplateModel(true, 200, "Agendamento deletado com sucesso", []);
     } catch (error: any) {
@@ -79,8 +75,11 @@ export class PrismaAppointmentRepository {
 
   async getAll(): Promise<ResponseTemplateInterface> {
     try {
-      const appointments = await prisma.appointment.findMany({
-        orderBy: { data: "asc", hora: "asc" },
+      const appointments = await prisma.agendamento.findMany({
+        orderBy: [
+          { data: "asc" },
+          { hora: "asc" },
+        ],
       });
 
       return new ResponseTemplateModel(true, 200, "Agendamentos recuperados com sucesso", appointments);

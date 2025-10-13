@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { ICreateProfessional } from "interface/profissional/create-profissional";
-import { CreateProfessionalModel } from "model/profissional/create-profissional-model";
-import { CreateProfissionalUseCase } from "use-case/profissional/create-profissional-use-case";
+import { ICreateProfessional } from "../../interface/profissional/create-profissional";
+import { CreateProfessionalModel } from "../../model/profissional/create-profissional-model";
+import { CreateProfissionalUseCase } from "../../use-case/profissional/create-profissional-use-case";
 
 export class CreateProfessionalController {
   async handle(req: Request, res: Response): Promise<void> {

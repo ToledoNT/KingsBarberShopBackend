@@ -1,39 +1,37 @@
-import { ResponseTemplateInterface } from "interface/response-template-interface.js";
 import { prisma } from "../prisma-connection";
-import { ResponseTemplateModel } from "model/response-templete-model.js";
-import { ICreateProfessional } from "interface/profissional/create-profissional";
-import { IUpdateProfessional } from "interface/profissional/update-profissional-interface";
+import { ICreateProfessional } from "../../../interface/profissional/create-profissional";
+import { IUpdateProfessional } from "../../../interface/profissional/update-profissional-interface";
+import { ResponseTemplateInterface } from "../../../interface/response-template-interface";
+import { ResponseTemplateModel } from "../../../model/response-templete-model";
 
 export class PrismaProfessionalRepository {
-  async create(data: ICreateProfessional): Promise<ResponseTemplateInterface> {
-    try {
-      const professional = await prisma.professional.create({
-        data: {
-          nome: data.nome,
-          email: data.email,
-          telefone: data.telefone,
-          procedimentos: {
-            create: data.procedimentos?.map(p => ({
-              nome: p.nome,
-              valor: p.valor
-            })) || [],
-          },
+async create(data: ICreateProfessional): Promise<ResponseTemplateInterface> {
+  try {
+    const professional = await prisma.profissional.create({
+      data: {
+        nome: data.nome,
+        email: data.email,
+        telefone: data.telefone,
+        procedimentos: {
+          create: data.procedimentos?.map(p => ({
+            nome: p.nome,
+            preco: p.valor  
+          })) || [],
         },
-      });
+      },
+    });
 
-      return new ResponseTemplateModel(true, 201, "Profissional criado com sucesso", professional);
+    return new ResponseTemplateModel(true, 201, "Profissional criado com sucesso", professional);
+  } catch (error: any) {
+    console.error("Erro ao criar profissional:", error);
 
-    } catch (error: any) {
-      console.error("Erro ao criar profissional:", error);
-
-      if (error.code === "P2002" && error.meta?.target?.includes("email")) {
-        return new ResponseTemplateModel(false, 409, "E-mail já está em uso", []);
-      }
-
-      return new ResponseTemplateModel(false, 500, "Erro interno ao criar profissional", []);
+    if (error.code === "P2002" && error.meta?.target?.includes("email")) {
+      return new ResponseTemplateModel(false, 409, "E-mail já está em uso", []);
     }
-  }
 
+    return new ResponseTemplateModel(false, 500, "Erro interno ao criar profissional", []);
+  }
+}
   async update(data: IUpdateProfessional): Promise<ResponseTemplateInterface> {
     try {
       const updateData: any = {};
@@ -51,13 +49,12 @@ export class PrismaProfessionalRepository {
         };
       }
 
-      const updatedProfessional = await prisma.professional.update({
+      const updatedProfessional = await prisma.profissional.update({
         where: { id: data.id },
         data: updateData,
       });
 
       return new ResponseTemplateModel(true, 200, "Profissional atualizado com sucesso", updatedProfessional);
-
     } catch (error: any) {
       console.error("Erro ao atualizar profissional:", error);
 
@@ -73,20 +70,15 @@ export class PrismaProfessionalRepository {
     }
   }
 
-  // ✅ Novo método de delete
   async deleteById(id: string): Promise<ResponseTemplateInterface> {
     try {
-      const professionalExists = await prisma.professional.findUnique({
-        where: { id }
-      });
+      const professionalExists = await prisma.profissional.findUnique({ where: { id } });
 
       if (!professionalExists) {
         return new ResponseTemplateModel(false, 404, "Profissional não encontrado", []);
       }
 
-      await prisma.professional.delete({
-        where: { id }
-      });
+      await prisma.profissional.delete({ where: { id } });
 
       return new ResponseTemplateModel(true, 200, "Profissional deletado com sucesso", []);
     } catch (error: any) {
@@ -97,23 +89,23 @@ export class PrismaProfessionalRepository {
 
   async getAll(): Promise<ResponseTemplateInterface> {
     try {
-    const professionals = await prisma.professional.findMany({
-      select: {
-        id: true,
-        nome: true,
-        email: true,
-        telefone: true,
-        procedimentos: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
+      const professionals = await prisma.profissional.findMany({
+        select: {
+          id: true,
+          nome: true,
+          email: true,
+          telefone: true,
+          procedimentos: true,
+          criadoEm: true,
+          atualizadoEm: true,
+        },
+        orderBy: { criadoEm: "desc" },
+      });
 
-    return new ResponseTemplateModel(true, 200, "Profissionais recuperados com sucesso", professionals);
-  } catch (error: any) {
-    console.error("Erro ao recuperar profissionais:", error);
-    return new ResponseTemplateModel(false, 500, "Erro interno ao recuperar profissionais", []);
+      return new ResponseTemplateModel(true, 200, "Profissionais recuperados com sucesso", professionals);
+    } catch (error: any) {
+      console.error("Erro ao recuperar profissionais:", error);
+      return new ResponseTemplateModel(false, 500, "Erro interno ao recuperar profissionais", []);
+    }
   }
-}
 }

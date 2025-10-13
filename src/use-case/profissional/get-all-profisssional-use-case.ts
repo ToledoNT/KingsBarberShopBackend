@@ -1,5 +1,5 @@
-import { PrismaProfessionalRepository } from "db/prisma/respositories/prisma-profissional-repository";
-import type { ResponseTemplateInterface } from "interface/response-template-interface";
+import { PrismaProfessionalRepository } from "../../db/prisma/respositories/prisma-profissional-repository";
+import { ResponseTemplateInterface } from "../../interface/response-template-interface";
 
 export class GetAllProfessionalsUseCase {
   async execute(): Promise<ResponseTemplateInterface> {

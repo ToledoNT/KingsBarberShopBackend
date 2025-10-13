@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import { IUpdateProfessional } from "interface/profissional/update-profissional-interface";
-import { UpdateProfissionalUseCase } from "use-case/profissional/update-profissional-use-case";
+import { IUpdateProfessional } from "../../interface/profissional/update-profissional-interface";
+import { UpdateProfissionalUseCase } from "../../use-case/profissional/update-profissional-use-case";
 
 export class UpdateProfessionalController {
   async handle(req: Request, res: Response): Promise<void> {

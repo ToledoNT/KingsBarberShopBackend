@@ -2,7 +2,8 @@
   "compilerOptions": {
     /* Saída e estrutura */
     "target": "ES2020",
-    "module": "CommonJS",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "rootDir": "src",
     "outDir": "dist",
     "removeComments": true,
@@ -10,20 +11,14 @@
     /* Boas práticas */
     "strict": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
     /* Node.js moderno */
-    "moduleResolution": "node",
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-
-    /* Paths e tipos */
-    "baseUrl": "./",
-    "paths": {
-      "*": ["src/*"]
-    }
+    "noImplicitAny": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

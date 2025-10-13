@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import { ICreateAppointment } from "interface/agendamentos/create-agendamento-interface";
-import { CreateAppointmentUseCase } from "use-case/agendamento/create-agendamento-use-case";
+import { ICreateAppointment } from "../../interface/agendamentos/create-agendamento-interface";
+import { CreateAppointmentUseCase } from "../../use-case/agendamento/create-agendamento-use-case";
 
 export class CreateAppointmentController {
   async handle(req: Request, res: Response): Promise<void> {
