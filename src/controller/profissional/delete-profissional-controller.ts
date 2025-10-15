@@ -16,6 +16,7 @@ export class DeleteProfessionalController {
     const useCase = new DeleteProfissionalUseCase();
     const deleteResult = await useCase.execute(profissionalId);
     console.log(deleteResult)
+    console.log(deleteResult)
 
     res.status(deleteResult.code).json(deleteResult);
   }

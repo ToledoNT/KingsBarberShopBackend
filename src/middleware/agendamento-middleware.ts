@@ -2,8 +2,8 @@ import type { Request, Response, NextFunction } from "express";
 
 export class AppointmentMiddleware {
   handleCreateAppointment(req: Request, res: Response, next: NextFunction): void {
-    const { nome, telefone, email, data, hora, servico, profissional } = req.body;
-
+    const { nome, telefone, email, data, hora, servico, profissional } = req.body
+    
     if (!nome || !telefone || !email || !data || !hora || !servico || !profissional) {
       res.status(400).json({
         status: false,

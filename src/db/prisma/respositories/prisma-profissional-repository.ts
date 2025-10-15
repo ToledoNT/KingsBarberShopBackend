@@ -5,33 +5,34 @@ import { ResponseTemplateInterface } from "../../../interface/response-template-
 import { ResponseTemplateModel } from "../../../model/response-templete-model";
 
 export class PrismaProfessionalRepository {
-async create(data: ICreateProfessional): Promise<ResponseTemplateInterface> {
-  try {
-    const professional = await prisma.profissional.create({
-      data: {
-        nome: data.nome,
-        email: data.email,
-        telefone: data.telefone,
-        procedimentos: {
-          create: data.procedimentos?.map(p => ({
-            nome: p.nome,
-            preco: p.valor  
-          })) || [],
+  async create(data: ICreateProfessional): Promise<ResponseTemplateInterface> {
+    try {
+      const professional = await prisma.profissional.create({
+        data: {
+          nome: data.nome,
+          email: data.email,
+          telefone: data.telefone,
+          procedimentos: {
+            create: data.procedimentos?.map(p => ({
+              nome: p.nome,
+              valor: p.valor,
+            })) || [],
+          },
         },
-      },
-    });
+      });
 
-    return new ResponseTemplateModel(true, 201, "Profissional criado com sucesso", professional);
-  } catch (error: any) {
-    console.error("Erro ao criar profissional:", error);
+      return new ResponseTemplateModel(true, 201, "Profissional criado com sucesso", professional);
+    } catch (error: any) {
+      console.error("Erro ao criar profissional:", error);
 
-    if (error.code === "P2002" && error.meta?.target?.includes("email")) {
-      return new ResponseTemplateModel(false, 409, "E-mail já está em uso", []);
+      if (error.code === "P2002" && error.meta?.target?.includes("email")) {
+        return new ResponseTemplateModel(false, 409, "E-mail já está em uso", []);
+      }
+
+      return new ResponseTemplateModel(false, 500, "Erro interno ao criar profissional", []);
     }
-
-    return new ResponseTemplateModel(false, 500, "Erro interno ao criar profissional", []);
   }
-}
+
   async update(data: IUpdateProfessional): Promise<ResponseTemplateInterface> {
     try {
       const updateData: any = {};
@@ -44,7 +45,7 @@ async create(data: ICreateProfessional): Promise<ResponseTemplateInterface> {
           deleteMany: {},
           create: data.procedimentos.map(p => ({
             nome: p.nome,
-            valor: p.valor
+            valor: p.valor,
           })),
         };
       }
@@ -72,17 +73,31 @@ async create(data: ICreateProfessional): Promise<ResponseTemplateInterface> {
 
   async deleteById(id: string): Promise<ResponseTemplateInterface> {
     try {
-      const professionalExists = await prisma.profissional.findUnique({ where: { id } });
+      const profissional = await prisma.profissional.findUnique({
+        where: { id },
+        include: { procedimentos: true, horariosDisponiveis: true },
+      });
 
-      if (!professionalExists) {
+      if (!profissional) {
         return new ResponseTemplateModel(false, 404, "Profissional não encontrado", []);
       }
 
+      await prisma.horarioDisponivel.deleteMany({ where: { profissionalId: id } });
+      await prisma.procedimento.deleteMany({ where: { profissionalId: id } });
       await prisma.profissional.delete({ where: { id } });
 
       return new ResponseTemplateModel(true, 200, "Profissional deletado com sucesso", []);
     } catch (error: any) {
       console.error("Erro ao deletar profissional:", error);
+
+      if (error.code === "P2014") {
+        return new ResponseTemplateModel(false, 400, "Não é possível deletar o profissional pois existem registros relacionados", []);
+      }
+
+      if (error.code === "P2025") {
+        return new ResponseTemplateModel(false, 404, "Profissional não encontrado para exclusão", []);
+      }
+
       return new ResponseTemplateModel(false, 500, "Erro interno ao deletar profissional", []);
     }
   }

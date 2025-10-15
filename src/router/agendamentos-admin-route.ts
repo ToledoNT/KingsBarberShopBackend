@@ -14,19 +14,19 @@ const appointmentMiddleware = new AppointmentMiddleware();
 const router = express.Router();
 
 router.post(
-  "/create",
+  "/appointment/create",
   appointmentMiddleware.handleCreateAppointment.bind(appointmentMiddleware) as RequestHandler,
   createAppointmentController.handle.bind(createAppointmentController) as RequestHandler
 );
 
 router.put(
-  "/update",
+  "/appointment/update",
   appointmentMiddleware.handleUpdateAppointment.bind(appointmentMiddleware) as RequestHandler,
   updateAppointmentController.handle.bind(updateAppointmentController) as RequestHandler
 );
 
 router.delete(
-  "/delete/:id",
+  "/appointment/delete/:id",
   appointmentMiddleware.handleDeleteAppointment.bind(appointmentMiddleware) as RequestHandler,
   deleteAppointmentController.handle.bind(deleteAppointmentController) as RequestHandler
 );

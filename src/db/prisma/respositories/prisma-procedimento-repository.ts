@@ -100,4 +100,27 @@ export class PrismaProcedimentoRepository {
       };
     }
   }
+
+async findByProfissionalId(profissionalId: string): Promise<ResponseTemplateInterface> {
+  try {
+    const procedimentos = await prisma.procedimento.findMany({
+      where: { profissionalId },
+    });
+
+    return {
+      status: true,
+      code: 200,
+      message: "Procedimentos carregados com sucesso",
+      data: procedimentos,
+    };
+  } catch (err: any) {
+    return {
+      status: false,
+      code: 500,
+      message: "Erro ao buscar procedimentos",
+      data: [],
+      error: err.message,
+    };
+    }
+  }
 }
