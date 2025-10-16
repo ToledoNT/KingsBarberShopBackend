@@ -1,42 +1,49 @@
 import { prisma } from "../prisma-connection";
-import { ICreateAppointment, StatusAgendamento } from "../../../interface/agendamentos/create-agendamento-interface";
+import { ICreateAppointment } from "../../../interface/agendamentos/create-agendamento-interface";
 import { IUpdateAppointment } from "../../../interface/agendamentos/update-agendamento-interface";
 import { ResponseTemplateInterface } from "../../../interface/response-template-interface";
 import { ResponseTemplateModel } from "../../../model/response-templete-model";
 
 export class PrismaAppointmentRepository {
-async create(data: ICreateAppointment): Promise<ResponseTemplateInterface> {
-  try {
-    const servico = await prisma.procedimento.findUnique({ where: { id: data.servico } });
-    const profissional = await prisma.profissional.findUnique({ where: { id: data.profissional } });
+  async create(data: ICreateAppointment): Promise<ResponseTemplateInterface> {
+    try {
+      // Busca dados do serviço e profissional (snapshot)
+      const servico = await prisma.procedimento.findUnique({
+        where: { id: data.servico },
+      });
 
-    if (!servico || !profissional) {
-      return new ResponseTemplateModel(false, 400, "Serviço ou profissional não encontrado", []);
+      const profissional = await prisma.profissional.findUnique({
+        where: { id: data.profissional },
+      });
+
+      if (!servico || !profissional) {
+        return new ResponseTemplateModel(false, 400, "Serviço ou profissional não encontrado", []);
+      }
+
+      const appointment = await prisma.agendamento.create({
+        data: {
+          nome: data.nome,
+          telefone: data.telefone,
+          email: data.email,
+          data: new Date(data.data),
+          inicio: data.inicio, 
+          fim: data.fim,       
+          servicoId: servico.id,
+          profissionalId: profissional.id,
+          status: data.status ? data.status : "Agendado",
+
+          servicoNome: servico.nome,
+          servicoPreco: servico.valor,
+          profissionalNome: profissional.nome,
+        },
+      });
+
+      return new ResponseTemplateModel(true, 201, "Agendamento criado com sucesso", appointment);
+    } catch (error: any) {
+      console.error("Erro ao criar agendamento:", error);
+      return new ResponseTemplateModel(false, 500, "Erro interno ao criar agendamento", []);
     }
-
-    const appointment = await prisma.agendamento.create({
-      data: {
-        nome: data.nome,
-        telefone: data.telefone,
-        email: data.email,
-        data: new Date(data.data),
-        inicio: data.inicio,
-        fim: data.fim,
-        servicoId: servico.id,
-        profissionalId: profissional.id,
-        status: StatusAgendamento.AGENDADO, 
-        servicoNome: servico.nome,
-        servicoPreco: servico.valor,
-        profissionalNome: profissional.nome,
-      },
-    });
-
-    return new ResponseTemplateModel(true, 201, "Agendamento criado com sucesso", appointment);
-  } catch (error: any) {
-    console.error("Erro ao criar agendamento:", error);
-    return new ResponseTemplateModel(false, 500, "Erro interno ao criar agendamento", []);
   }
-}
 
   async update(data: IUpdateAppointment): Promise<ResponseTemplateInterface> {
     try {
@@ -90,7 +97,7 @@ async create(data: ICreateAppointment): Promise<ResponseTemplateInterface> {
       const appointments = await prisma.agendamento.findMany({
         orderBy: [
           { data: "asc" },
-          { inicio: "asc" }, 
+          { inicio: "asc" }, // ordena por inicio em vez de hora
         ],
       });
 
@@ -100,4 +107,4 @@ async create(data: ICreateAppointment): Promise<ResponseTemplateInterface> {
       return new ResponseTemplateModel(false, 500, "Erro interno ao recuperar agendamentos", []);
     }
   }
-} 
+}

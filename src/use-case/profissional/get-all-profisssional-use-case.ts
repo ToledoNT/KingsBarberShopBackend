@@ -1,18 +1,17 @@
 import { PrismaProfessionalRepository } from "../../db/prisma/respositories/prisma-profissional-repository";
-import { IUpdateProfessional } from "../../interface/profissional/update-profissional-interface";
 import { ResponseTemplateInterface } from "../../interface/response-template-interface";
 import { CreateLog } from "../logs/create-log";
 
-export class UpdateProfissionalUseCase {
-  async execute(data: IUpdateProfessional): Promise<ResponseTemplateInterface> {
+export class GetAllProfessionalsUseCase {
+  async execute(): Promise<ResponseTemplateInterface> {
     const repository = new PrismaProfessionalRepository();
 
-    const responseUpdate = await repository.update(data);
+    const responseGetAll = await repository.getAll();
 
-    if (!responseUpdate.status) {
-      await new CreateLog().execute(responseUpdate);
+    if (!responseGetAll.status) {
+      await new CreateLog().execute(responseGetAll);
     }
 
-    return responseUpdate;
+    return responseGetAll;
   }
 }
