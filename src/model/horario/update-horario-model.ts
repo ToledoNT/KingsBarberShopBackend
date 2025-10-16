@@ -1,7 +1,6 @@
 import { IUpdateHorario } from "../../interface/horario/update-horario";
 
 export class UpdateHorarioModel {
-  id: string;
   profissionalId?: string;
   data?: Date;
   inicio?: string;
@@ -9,7 +8,6 @@ export class UpdateHorarioModel {
   disponivel?: boolean;
 
   constructor(data: IUpdateHorario) {
-    this.id = data.id;
     this.profissionalId = data.profissionalId;
     this.data = data.data;
     this.inicio = data.inicio;

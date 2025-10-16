@@ -1,7 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 
 export class ProcedimentoMiddleware {
-  // ✅ Middleware para criar procedimento
   handleCreateProcedimento(req: Request, res: Response, next: NextFunction): void {
     const { nome, valor, profissionalId } = req.body;
 

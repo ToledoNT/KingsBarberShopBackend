@@ -4,13 +4,19 @@ import { CreateHorarioUseCase } from "../../use-case/horario/create-horario-use-
 
 export class CreateHorarioController {
   async handle(req: Request, res: Response): Promise<void> {
-    const { barbeiro, data } = req.body;
+    const { profissional, data } = req.body;
 
-    if (!barbeiro || !data) {
+    if (
+      !profissional ||
+      typeof profissional !== "object" ||
+      !profissional.id ||
+      typeof profissional.id !== "string" ||
+      profissional.id.trim() === ""
+    ) {
       res.status(400).json({
         status: false,
         code: 400,
-        message: "Os campos barbeiro e data são obrigatórios.",
+        message: "O campo 'profissional.id' é obrigatório e deve ser uma string válida.",
         data: [],
       });
       return;
@@ -28,8 +34,7 @@ export class CreateHorarioController {
     }
 
     const horariosParaCriar: ICreateHorario[] = [];
-    
-    const horaInicial = 7 * 60;
+    const horaInicial = 7 * 60; 
     const horaFinal = 21 * 60;  
     const intervalo = 30;       
 
@@ -43,11 +48,11 @@ export class CreateHorarioController {
       const fim = `${fimHoras.toString().padStart(2, "0")}:${fimMinutos.toString().padStart(2, "0")}`;
 
       horariosParaCriar.push({
-        profissionalId: barbeiro,
+        profissionalId: profissional.id, 
         data: dataValidada,
         inicio,
         fim,
-        disponivel: false, 
+        disponivel: false,
       });
     }
 

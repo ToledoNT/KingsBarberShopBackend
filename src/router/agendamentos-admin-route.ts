@@ -32,7 +32,7 @@ router.delete(
 );
 
 router.get(
-  "/all",
+  "/appointment/all",
   getAllAppointmentsController.handle.bind(getAllAppointmentsController) as RequestHandler
 );
 

@@ -37,25 +37,29 @@ model HorarioDisponivel {
   data            DateTime
   inicio          String
   fim             String
-  disponivel      Boolean       @default(false) // ✅ controla se o horário está livre
+  disponivel      Boolean       @default(false)
   criadoEm        DateTime      @default(now())
   atualizadoEm    DateTime      @updatedAt
 }
 
 model Agendamento {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  nome           String
-  telefone       String
-  email          String
-  data           DateTime
-  hora           String
-  servicoId      String        @db.ObjectId
-  servico        Procedimento  @relation(fields: [servicoId], references: [id])
-  profissionalId String        @db.ObjectId
-  profissional   Profissional  @relation(fields: [profissionalId], references: [id])
-  status         String        @default("Pendente")
-  criadoEm       DateTime      @default(now())
-  atualizadoEm   DateTime      @updatedAt
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId
+  nome             String
+  telefone         String
+  email            String
+  data             DateTime
+  inicio           String?       // ✅ adiciona aqui
+  fim              String?       // ✅ adiciona aqui
+  servicoId        String        @db.ObjectId
+  servico          Procedimento  @relation(fields: [servicoId], references: [id])
+  profissionalId   String        @db.ObjectId
+  profissional     Profissional  @relation(fields: [profissionalId], references: [id])
+  status           String        @default("Agendado")
+  servicoNome      String?
+  servicoPreco     Float?
+  profissionalNome String?
+  criadoEm         DateTime      @default(now())
+  atualizadoEm     DateTime      @updatedAt
 }
 
 model User {

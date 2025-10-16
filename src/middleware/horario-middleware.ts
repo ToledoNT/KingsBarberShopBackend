@@ -2,18 +2,27 @@ import type { Request, Response, NextFunction } from "express";
 
 export class HorarioMiddleware {
   handleCreateHorario(req: Request, res: Response, next: NextFunction): void {
-    const { barbeiro, data } = req.body;
+    const { profissional, data } = req.body;
+    console.log(req.body);
 
-    if (!barbeiro || typeof barbeiro !== "string" || barbeiro.trim() === "") {
+    // Validação do objeto profissional
+    if (
+      !profissional ||
+      typeof profissional !== "object" ||
+      !profissional.id ||
+      typeof profissional.id !== "string" ||
+      profissional.id.trim() === ""
+    ) {
       res.status(400).json({
         status: false,
         code: 400,
-        message: "O campo 'barbeiroId' é obrigatório e deve ser uma string válida.",
+        message: "O campo 'profissional.id' é obrigatório e deve ser uma string válida.",
         data: null,
       });
       return;
     }
 
+    // Validação da data
     if (!data || isNaN(Date.parse(data))) {
       res.status(400).json({
         status: false,
@@ -24,8 +33,11 @@ export class HorarioMiddleware {
       return;
     }
 
+    req.body.data = new Date(data).toISOString().split("T")[0];
+
     next();
   }
+
 
   handleUpdateHorario(req: Request, res: Response, next: NextFunction): void {
     const { id } = req.params;

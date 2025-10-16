@@ -15,7 +15,7 @@ export class PrismaHorarioRepository {
           fim: horario.fim,
           disponivel: horario.disponivel ?? false,
           profissional: {
-            connect: { id: horario.profissionalId }, 
+            connect: { id: horario.profissionalId },
           },
         },
         include: {
@@ -40,45 +40,44 @@ export class PrismaHorarioRepository {
     }
   }
 
-async update(id: string, horario: IUpdateHorario): Promise<ResponseTemplateInterface> {
-  try {
-    // Monta o objeto apenas com os campos que vieram no payload
-    const dataToUpdate: any = {};
+  async update(id: string, horario: IUpdateHorario): Promise<ResponseTemplateInterface> {
+    try {
+      const dataToUpdate: any = {};
 
-    if (horario.data) dataToUpdate.data = horario.data;
-    if (horario.inicio) dataToUpdate.inicio = horario.inicio;
-    if (horario.fim) dataToUpdate.fim = horario.fim;
-    if (horario.disponivel !== undefined) dataToUpdate.disponivel = horario.disponivel;
-    if (horario.profissionalId) {
-      dataToUpdate.profissional = {
-        connect: { id: horario.profissionalId },
+      if (horario.data) dataToUpdate.data = horario.data;
+      if (horario.inicio) dataToUpdate.inicio = horario.inicio;
+      if (horario.fim) dataToUpdate.fim = horario.fim;
+      if (horario.disponivel !== undefined) dataToUpdate.disponivel = horario.disponivel;
+      if (horario.profissionalId) {
+        dataToUpdate.profissional = {
+          connect: { id: horario.profissionalId },
+        };
+      }
+
+      const updated = await prisma.horarioDisponivel.update({
+        where: { id },
+        data: dataToUpdate,
+        include: {
+          profissional: true,
+        },
+      });
+
+      return {
+        status: true,
+        code: 200,
+        message: "Horário disponível atualizado com sucesso.",
+        data: updated,
+      };
+    } catch (err: any) {
+      return {
+        status: false,
+        code: 500,
+        message: "Erro ao atualizar horário disponível.",
+        data: [],
+        error: err.message,
       };
     }
-
-    const updated = await prisma.horarioDisponivel.update({
-      where: { id },
-      data: dataToUpdate,
-      include: {
-        profissional: true,
-      },
-    });
-
-    return {
-      status: true,
-      code: 200,
-      message: "Horário disponível atualizado com sucesso.",
-      data: updated,
-    };
-  } catch (err: any) {
-    return {
-      status: false,
-      code: 500,
-      message: "Erro ao atualizar horário disponível.",
-      data: [],
-      error: err.message,
-    };
   }
-}
 
   async delete(id: string): Promise<ResponseTemplateInterface> {
     try {
@@ -125,28 +124,49 @@ async update(id: string, horario: IUpdateHorario): Promise<ResponseTemplateInter
     }
   }
 
-  async getByBarbeiro(profissionalId: string): Promise<ResponseTemplateInterface> {
+async getByBarbeiro(profissionalId: string): Promise<ResponseTemplateInterface> {
+  try {
+    const horarios = await prisma.horarioDisponivel.findMany({
+      where: { profissionalId },
+      include: { profissional: true },
+      orderBy: { data: "asc" },
+    });
+
+    const horariosFormatados = horarios.map(h => ({
+      ...h,
+      data: h.data.toISOString().split('T')[0], 
+    }));
+
+    return {
+      status: true,
+      code: 200,
+      message: `Horários do profissional ${profissionalId} carregados com sucesso.`,
+      data: horariosFormatados,
+    };
+  } catch (err: any) {
+    return {
+      status: false,
+      code: 500,
+      message: "Erro ao buscar horários do profissional.",
+      data: [],
+      error: err.message,
+    };
+  }
+}
+
+
+  async findById(id: string): Promise<any> {
     try {
-      const horarios = await prisma.horarioDisponivel.findMany({
-        where: { profissionalId },
+      const horario = await prisma.horarioDisponivel.findUnique({
+        where: { id },
         include: { profissional: true },
-        orderBy: { data: "asc" },
       });
 
-      return {
-        status: true,
-        code: 200,
-        message: `Horários do profissional ${profissionalId} carregados com sucesso.`,
-        data: horarios,
-      };
+      if (!horario) return null;
+      return horario;
     } catch (err: any) {
-      return {
-        status: false,
-        code: 500,
-        message: "Erro ao buscar horários do profissional.",
-        data: [],
-        error: err.message,
-      };
+      console.error("Erro ao buscar horário por ID:", err.message);
+      return null;
     }
   }
 }

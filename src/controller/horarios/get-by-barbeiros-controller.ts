@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { GetHorariosByBarbeiroUseCase } from "../../use-case/horario/get-by-barbeiro-use-case";
 import { GetProcedimentosByProfissionalUseCase } from "../../use-case/procedimento/fetch-by-profissional-use-case";
+import { HorarioDTO, ProcedimentoDTO } from "../../interface/horario/get-horario-barbeiro-interface";
 
 export class GetHorariosByBarbeiroController {
   async handle(req: Request<{ barbeiro: string }>, res: Response): Promise<Response> {
@@ -20,31 +21,34 @@ export class GetHorariosByBarbeiroController {
         new GetProcedimentosByProfissionalUseCase().execute(barbeiro),
       ]);
 
-      const horariosDisponiveis = (horariosResult.data || [])
+      const horariosDisponiveis: HorarioDTO[] = (horariosResult.data || [])
         .filter((h: any) => h.disponivel)
         .map((h: any) => ({
           id: h.id,
           inicio: h.inicio,
           fim: h.fim,
-          label: `${h.inicio} - ${h.fim}`,
+          data: h.data, 
+          label: h.label ?? `${h.inicio} - ${h.fim}`,
           disponivel: h.disponivel,
         }));
 
-      const procedimentos = (procedimentosResult.data || []).map((p: any) => ({
+      const procedimentos: ProcedimentoDTO[] = (procedimentosResult.data || []).map((p: any) => ({
         id: p.id,
         nome: p.nome,
         valor: p.valor,
-        label: `${p.nome} - R$${p.valor.toFixed(2)}`,
+        label: p.label ?? `${p.nome} - R$${p.valor.toFixed(2)}`,
       }));
+
+      const responseData = {
+        barbeiroId: barbeiro,
+        horarios: horariosDisponiveis,
+        procedimentos,
+      };
 
       return res.status(200).json({
         status: true,
         message: "Dados carregados com sucesso",
-        data: {
-          barbeiroId: barbeiro,
-          horarios: horariosDisponiveis,
-          procedimentos,
-        },
+        data: responseData,
       });
     } catch (error) {
       console.error("Erro ao buscar dados do barbeiro:", error);

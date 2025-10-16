@@ -2,14 +2,14 @@ import type { Request, Response, NextFunction } from "express";
 
 export class AppointmentMiddleware {
   handleCreateAppointment(req: Request, res: Response, next: NextFunction): void {
-    const { nome, telefone, email, data, hora, servico, profissional } = req.body
-    
-    if (!nome || !telefone || !email || !data || !hora || !servico || !profissional) {
+    const { nome, telefone, email, data, hora, servico, barbeiro } = req.body;
+
+    if (!nome || !telefone || !email || !data || !hora || !servico || !barbeiro) {
       res.status(400).json({
         status: false,
         code: 400,
         message: "Todos os campos são obrigatórios.",
-        data: []
+        data: [],
       });
       return;
     }
@@ -18,24 +18,24 @@ export class AppointmentMiddleware {
   }
 
   handleUpdateAppointment(req: Request, res: Response, next: NextFunction): void {
-    const { id, nome, telefone, email, data, hora, servico, profissional, status } = req.body;
+    const { id, nome, telefone, email, data, hora, servico, barbeiro, status } = req.body;
 
     if (!id) {
       res.status(400).json({
         status: false,
         code: 400,
         message: "O campo 'id' é obrigatório para atualização.",
-        data: []
+        data: [],
       });
       return;
     }
 
-    if (!nome && !telefone && !email && !data && !hora && !servico && !profissional && !status) {
+    if (!nome && !telefone && !email && !data && !hora && !servico && !barbeiro && !status) {
       res.status(400).json({
         status: false,
         code: 400,
         message: "Nenhum campo fornecido para atualização.",
-        data: []
+        data: [],
       });
       return;
     }
@@ -51,7 +51,7 @@ export class AppointmentMiddleware {
         status: false,
         code: 400,
         message: "O campo 'id' é obrigatório para deleção.",
-        data: []
+        data: [],
       });
       return;
     }
