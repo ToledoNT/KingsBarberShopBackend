@@ -3,6 +3,7 @@ import { ICreateAppointment } from "../../interface/agendamentos/create-agendame
 import { CreateAppointmentUseCase } from "../../use-case/agendamento/create-agendamento-use-case";
 import { GetHorarioByIdUseCase } from "../../use-case/horario/get-horario-by-id-use-case";
 import { DeleteHorarioUseCase } from "../../use-case/horario/delete-horario-use-case";
+import { UpdateRelatorioUseCase } from "../../use-case/relatorio/relatorio-use-case";
 
 export class CreateAppointmentController {
   async handle(req: Request, res: Response): Promise<void> {
@@ -18,7 +19,6 @@ export class CreateAppointmentController {
       fim: req.body.fim,
     };
 
-    // Validação básica
     if (
       !data.nome ||
       !data.telefone ||
@@ -34,16 +34,13 @@ export class CreateAppointmentController {
       return;
     }
 
-    // Busca o horário pelo ID
     const horarioResponse = await new GetHorarioByIdUseCase().execute(data.hora);
-
     if (!horarioResponse?.status || !horarioResponse.data) {
       res.status(404).json({ message: "Horário não encontrado." });
       return;
     }
 
     const horario = horarioResponse.data;
-
     const horarioData = horario.data ? new Date(horario.data) : null;
     const dataAgendamento = data.data ? new Date(data.data) : null;
 
@@ -63,7 +60,6 @@ export class CreateAppointmentController {
     }
 
     const appointmentResult = await new CreateAppointmentUseCase().execute(data);
-
     if (!appointmentResult?.status) {
       res.status(500).json({ message: "Erro ao criar agendamento." });
       return;
@@ -73,6 +69,12 @@ export class CreateAppointmentController {
     if (!deleteResult?.status) {
       console.warn("Falha ao remover o horário utilizado:", deleteResult.message);
     }
+
+    const updateRelatorioUseCase = new UpdateRelatorioUseCase();
+    await updateRelatorioUseCase.execute({
+      mesAno: new Date(dataAgendamento.getFullYear(), dataAgendamento.getMonth(), 1),
+      agendamentos: 1, // incrementa 1 agendamento
+    });
 
     res.status(201).json(appointmentResult);
   }

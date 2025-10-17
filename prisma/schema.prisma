@@ -71,6 +71,28 @@ model User {
   atualizadoEm DateTime @updatedAt
 }
 
+model Financeiro {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  agendamentoId    String   @db.ObjectId
+  clienteNome      String
+  valor            Float
+  status           String   @default("Pago") 
+  criadoEm         DateTime @default(now())
+  atualizadoEm     DateTime @updatedAt
+}
+
+model Relatorio {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  mesAno        DateTime 
+  agendamentos  Int      @default(0)
+  faturamento   Float    @default(0)
+  cancelados    Int      @default(0)
+  naoCompareceu Int      @default(0)
+
+  criadoEm      DateTime @default(now())
+  atualizadoEm  DateTime @updatedAt
+}
+
 model Log {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   value     String

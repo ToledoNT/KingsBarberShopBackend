@@ -97,7 +97,7 @@ export class PrismaAppointmentRepository {
       const appointments = await prisma.agendamento.findMany({
         orderBy: [
           { data: "asc" },
-          { inicio: "asc" }, // ordena por inicio em vez de hora
+          { inicio: "asc" }, 
         ],
       });
 
@@ -107,4 +107,25 @@ export class PrismaAppointmentRepository {
       return new ResponseTemplateModel(false, 500, "Erro interno ao recuperar agendamentos", []);
     }
   }
+
+  async findById(id: string): Promise<ResponseTemplateInterface> {
+  try {
+    const appointment = await prisma.agendamento.findUnique({
+      where: { id },
+      include: {
+        profissional: true,
+        servico: true,
+      },
+    });
+
+    if (!appointment) {
+      return new ResponseTemplateModel(false, 404, "Agendamento não encontrado", []);
+    }
+
+    return new ResponseTemplateModel(true, 200, "Agendamento encontrado com sucesso", appointment);
+  } catch (error: any) {
+    console.error("Erro ao buscar agendamento por ID:", error);
+    return new ResponseTemplateModel(false, 500, "Erro interno ao buscar agendamento", []);
+  }
+}
 }
