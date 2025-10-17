@@ -34,4 +34,28 @@ export class PrismaFinanceiroRepository {
       };
     }
   }
+
+  // ✅ GET ALL Financeiro
+  async getAll(): Promise<ResponseTemplateInterface> {
+    try {
+      const allFinanceiro = await prisma.financeiro.findMany({
+        orderBy: { criadoEm: "desc" },
+      });
+
+      return {
+        status: true,
+        code: 200,
+        message: "Todos os lançamentos financeiros recuperados com sucesso.",
+        data: allFinanceiro,
+      };
+    } catch (err: any) {
+      return {
+        status: false,
+        code: 500,
+        message: "Erro ao buscar lançamentos financeiros.",
+        data: [],
+        error: err.message,
+      };
+    }
+  }
 }
