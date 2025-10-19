@@ -4,7 +4,8 @@ import { UpdateProfissionalUseCase } from "../../use-case/profissional/update-pr
 
 export class UpdateProfessionalController {
   async handle(req: Request, res: Response): Promise<void> {
-    const { id, nome, email, telefone, procedimentos } = req.body;
+    const {nome, email, telefone, procedimentos } = req.body;
+    const id = req.params.id
 
     if (!id) {
       res.status(400).json({

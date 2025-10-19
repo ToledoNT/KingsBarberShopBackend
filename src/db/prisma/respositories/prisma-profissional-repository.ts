@@ -71,36 +71,48 @@ export class PrismaProfessionalRepository {
     }
   }
 
-  async deleteById(id: string): Promise<ResponseTemplateInterface> {
-    try {
-      const profissional = await prisma.profissional.findUnique({
-        where: { id },
-        include: { procedimentos: true, horariosDisponiveis: true },
-      });
+async deleteById(id: string): Promise<ResponseTemplateInterface> {
+  try {
+    const profissional = await prisma.profissional.findUnique({
+      where: { id },
+      include: {
+        procedimentos: { include: { agendamentos: true } },
+        horariosDisponiveis: true,
+      },
+    });
 
-      if (!profissional) {
-        return new ResponseTemplateModel(false, 404, "Profissional não encontrado", []);
-      }
-
-      await prisma.horarioDisponivel.deleteMany({ where: { profissionalId: id } });
-      await prisma.procedimento.deleteMany({ where: { profissionalId: id } });
-      await prisma.profissional.delete({ where: { id } });
-
-      return new ResponseTemplateModel(true, 200, "Profissional deletado com sucesso", []);
-    } catch (error: any) {
-      console.error("Erro ao deletar profissional:", error);
-
-      if (error.code === "P2014") {
-        return new ResponseTemplateModel(false, 400, "Não é possível deletar o profissional pois existem registros relacionados", []);
-      }
-
-      if (error.code === "P2025") {
-        return new ResponseTemplateModel(false, 404, "Profissional não encontrado para exclusão", []);
-      }
-
-      return new ResponseTemplateModel(false, 500, "Erro interno ao deletar profissional", []);
+    if (!profissional) {
+      return new ResponseTemplateModel(false, 404, "Profissional não encontrado", []);
     }
+
+    const procedimentosComAgendamento = profissional.procedimentos.filter(
+      (p) => p.agendamentos && p.agendamentos.length > 0
+    );
+
+    if (procedimentosComAgendamento.length > 0) {
+      return new ResponseTemplateModel(
+        false,
+        400,
+        "Não é possível deletar o profissional: existem agendamentos vinculados aos procedimentos",
+        []
+      );
+    }
+
+    await prisma.horarioDisponivel.deleteMany({ where: { profissionalId: id } });
+    await prisma.procedimento.deleteMany({ where: { profissionalId: id } });
+    await prisma.profissional.delete({ where: { id } });
+
+    return new ResponseTemplateModel(true, 200, "Profissional deletado com sucesso", []);
+  } catch (error: any) {
+    console.error("Erro ao deletar profissional:", error);
+
+    if (error?.code === "P2025") {
+      return new ResponseTemplateModel(false, 404, "Profissional não encontrado para exclusão", []);
+    }
+
+    return new ResponseTemplateModel(false, 500, "Erro interno ao deletar profissional", []);
   }
+}
 
   async getAll(): Promise<ResponseTemplateInterface> {
     try {

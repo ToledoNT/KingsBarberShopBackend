@@ -73,7 +73,7 @@ export class CreateAppointmentController {
     const updateRelatorioUseCase = new UpdateRelatorioUseCase();
     await updateRelatorioUseCase.execute({
       mesAno: new Date(dataAgendamento.getFullYear(), dataAgendamento.getMonth(), 1),
-      agendamentos: 1, // incrementa 1 agendamento
+      agendamentos: 1, 
     });
 
     res.status(201).json(appointmentResult);

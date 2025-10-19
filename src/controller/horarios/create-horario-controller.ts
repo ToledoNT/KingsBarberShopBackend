@@ -22,7 +22,14 @@ export class CreateHorarioController {
       return;
     }
 
-    const dataValidada = new Date(data);
+    let dataValidada: Date;
+    
+    if (typeof data === 'string' && data.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      dataValidada = new Date(data + 'T00:00:00.000Z');
+    } else {
+      dataValidada = new Date(data);
+    }
+
     if (isNaN(dataValidada.getTime())) {
       res.status(400).json({
         status: false,
@@ -32,6 +39,12 @@ export class CreateHorarioController {
       });
       return;
     }
+
+    const dataUTC = new Date(Date.UTC(
+      dataValidada.getUTCFullYear(),
+      dataValidada.getUTCMonth(),
+      dataValidada.getUTCDate()
+    ));
 
     const horariosParaCriar: ICreateHorario[] = [];
     const horaInicial = 7 * 60; 
@@ -49,7 +62,7 @@ export class CreateHorarioController {
 
       horariosParaCriar.push({
         profissionalId: profissional.id, 
-        data: dataValidada,
+        data: dataUTC, 
         inicio,
         fim,
         disponivel: false,
