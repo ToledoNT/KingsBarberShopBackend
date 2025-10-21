@@ -6,6 +6,7 @@ import AgendamentoRoute from "./router/agendamentos-admin-route";
 import ProcedimentoRoute from "./router/procedimentos-route";
 import HorarioRoute from "./router/horario-router";
 import FinanceRoute from "./router/financeiro-route";
+import RelatorioRoute from "./router/dashboard-route"
 
 const server = express();
 
@@ -27,20 +28,22 @@ server.use(
         callback(new Error("Origem não permitida pelo CORS"));
       }
     },
+    credentials: true,
   })
 );
 
 server.use(express.json());
 
-// 🧩 Suas rotas
+// 🧩 Suas rotas originais
 server.use("/api", UserRoute);
 server.use("/api", ProfissionalRoute);
 server.use("/api", AgendamentoRoute);
 server.use("/api", ProcedimentoRoute);
 server.use("/api", HorarioRoute);
 server.use("/api", FinanceRoute);
+server.use("/api", RelatorioRoute)
 
-// 🔥 Rota de teste
+// 🔥 Rota raiz de teste
 server.get("/", (req: Request, res: Response) => {
   res.send("🔥 Servidor rodando e rotas carregadas com sucesso!");
 });

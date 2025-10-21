@@ -40,7 +40,6 @@ export class UpdateRelatorioUseCase {
         const relatorioModel = new UpdateRelatorioModel(updatedData);
         response = await repository.update(existingReport.data.id, relatorioModel.toPayload());
       } else {
-        // Cria novo relatório usando o model
         const newRelatorio: IUpdateRelatorio = {
           mesAno: mesAnoNormalized,
           agendamentos: data.agendamentos ?? 0,

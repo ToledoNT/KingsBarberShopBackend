@@ -3,7 +3,7 @@ import { ICreateAppointment } from "../../interface/agendamentos/create-agendame
 import { CreateAppointmentUseCase } from "../../use-case/agendamento/create-agendamento-use-case";
 import { GetHorarioByIdUseCase } from "../../use-case/horario/get-horario-by-id-use-case";
 import { DeleteHorarioUseCase } from "../../use-case/horario/delete-horario-use-case";
-import { UpdateRelatorioUseCase } from "../../use-case/relatorio/relatorio-use-case";
+import { UpdateRelatorioUseCase } from "../../use-case/relatorio/update-relatorio-use-case";
 
 export class CreateAppointmentController {
   async handle(req: Request, res: Response): Promise<void> {

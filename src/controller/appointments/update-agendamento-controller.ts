@@ -3,7 +3,7 @@ import { StatusAgendamento } from "../../interface/agendamentos/create-agendamen
 import { UpdateAppointmentUseCase } from "../../use-case/agendamento/update-agendamento-use-case";
 import { CreateFinanceiroUseCase } from "../../use-case/financeiro/create-financeiro-use-case";
 import { GetAppointmentByIdUseCase } from "../../use-case/agendamento/get-agendamento-by-id-use-case";
-import { UpdateRelatorioUseCase } from "../../use-case/relatorio/relatorio-use-case";
+import { UpdateRelatorioUseCase } from "../../use-case/relatorio/update-relatorio-use-case";
 import { CreateHorarioUseCase } from "../../use-case/horario/create-horario-use-case";
 import { ICreateHorario } from "../../interface/horario/create-horario-interface";
 

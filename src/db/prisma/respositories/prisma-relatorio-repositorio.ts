@@ -60,4 +60,20 @@ async findByMesAno(mesAno: Date): Promise<ResponseTemplateInterface> {
       return new ResponseTemplateModel(false, 500, `Erro ao buscar relatório: ${error.message}`, []);
     }
   }
+  async getAll(): Promise<ResponseTemplateInterface> {
+  try {
+    const relatorios = await prisma.relatorio.findMany({
+      orderBy: { mesAno: "desc" }, // opcional, ordena do mais recente
+    });
+
+    if (relatorios.length > 0) {
+      return new ResponseTemplateModel(true, 200, "Relatórios encontrados", relatorios);
+    }
+
+    return new ResponseTemplateModel(true, 200, "Nenhum relatório encontrado", []);
+  } catch (error: any) {
+    console.error("Erro ao buscar todos os relatórios:", error);
+    return new ResponseTemplateModel(false, 500, `Erro interno ao buscar relatórios: ${error.message}`, []);
+    }
+  }
 }
