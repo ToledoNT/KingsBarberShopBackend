@@ -69,8 +69,6 @@ export class GetDashboardMetricsController {
         relatorios: relatoriosData,
       };
 
-      console.log(dashboardData);
-
       res.status(200).json(
         new ResponseTemplateModel(
           true,

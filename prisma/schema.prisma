@@ -61,14 +61,18 @@ model Agendamento {
   criadoEm         DateTime      @default(now())
   atualizadoEm     DateTime      @updatedAt
 }
-
 model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   email        String   @unique
   password     String
+  role         Role     @default(BARBEIRO)
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
+}
+enum Role {
+  ADMIN
+  BARBEIRO
 }
 
 model Financeiro {

@@ -9,63 +9,68 @@ export class LoginUserController {
       const { email, password } = req.body;
 
       if (!email || !password) {
-         res.status(400).json({
+        res.status(400).json({
           status: false,
           code: 400,
           message: "Os campos 'email' e 'password' são obrigatórios.",
           data: null,
         });
+        return;
       }
 
       const userResult = await new GetUserByEmailUseCase().execute(email);
+
       if (!userResult.status || !userResult.data) {
-         res.status(401).json({
+        res.status(401).json({
           status: false,
           code: 401,
-          message: "Usuário ou senha inválidos",
+          message: "Usuário ou senha inválidos.",
           data: null,
         });
+        return;
       }
 
       const user = userResult.data;
+
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) {
-         res.status(401).json({
+        res.status(401).json({
           status: false,
           code: 401,
-          message: "Usuário ou senha inválidos",
+          message: "Usuário ou senha inválidos.",
           data: null,
         });
+        return;
       }
 
-      // ✅ Gera token JWT
       const token = jwt.sign(
-        { id: user.id, email: user.email },
+        { id: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET!,
         { expiresIn: "1d" }
       );
 
-      // 🔑 Configuração do cookie (comentado para testes)
+      // 🔑 Cookie comentado (mantido para referência futura)
       /*
       res.cookie("token", token, {
-        httpOnly: true,   // 🔹 deixar comentado por enquanto
-        secure: false,    // 🔹 false em dev/localhost
+        httpOnly: true,   // 🔹 Protege contra JS no front
+        secure: false,    // 🔹 false em dev/localhost, true em produção
         sameSite: "lax",  // 🔹 "lax" ou "strict"
         maxAge: 24 * 60 * 60 * 1000,
         path: "/",
       });
       */
 
-      // ✅ Retorna sucesso com token no JSON
+      // ✅ Retorno de sucesso com token e role
       res.status(200).json({
         status: true,
         code: 200,
-        message: "Login realizado com sucesso",
+        message: "Login realizado com sucesso.",
         data: {
           id: user.id,
-          email: user.email,
           name: user.name,
-          token, // 🔹 token retornado para uso no front
+          email: user.email,
+          role: user.role, 
+          token,
         },
       });
     } catch (err) {
@@ -73,7 +78,7 @@ export class LoginUserController {
       res.status(500).json({
         status: false,
         code: 500,
-        message: "Erro interno ao realizar login",
+        message: "Erro interno ao realizar login.",
         data: null,
       });
     }

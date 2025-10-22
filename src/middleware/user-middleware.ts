@@ -2,9 +2,6 @@ import type { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 export class UserMiddleware {
-  // --------------------------
-  // Valida criação de usuário
-  // --------------------------
   async handleCreateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { name, email, password } = req.body;
     const missingFields: string[] = [];
@@ -20,15 +17,13 @@ export class UserMiddleware {
         message: `Campos obrigatórios faltando: ${missingFields.join(", ")}`,
         data: null,
       });
-      return; // interrompe execução
+      return;
     }
 
     next();
   }
 
-  // --------------------------
   // Valida login
-  // --------------------------
   async handleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { email, password } = req.body;
     const missingFields: string[] = [];
@@ -43,54 +38,44 @@ export class UserMiddleware {
         message: `Campos obrigatórios faltando: ${missingFields.join(", ")}`,
         data: null,
       });
-      return; // interrompe execução
+      return;
     }
 
     next();
   }
 
-  // --------------------------
-  // Autenticação JWT
-  // --------------------------
-  async handleAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      // Pega token do header Authorization: "Bearer <token>"
-      const authHeader = req.headers['authorization'];
-      const token = authHeader?.split(' ')[1]; 
+// Autenticação JWT
+async handleAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader?.split(' ')[1]; 
 
-      if (!token) {
-        console.log("Token não fornecido");
-        res.status(401).json({
-          status: false,
-          code: 401,
-          message: "Token não fornecido",
-          data: null,
-        });
-        return; // interrompe a execução
-      }
-
-      // Decodifica e verifica token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-
-      // Armazena payload no req para uso futuro
-      (req as any).user = decoded;
-
-      // Continua para o próximo middleware
-      next();
-    } catch (err) {
-      console.error("JWT inválido:", err);
+    if (!token) {
       res.status(401).json({
         status: false,
         code: 401,
-        message: "Token inválido ou expirado",
+        message: "Token não fornecido",
         data: null,
       });
+      return; // apenas return para sair da função, sem retornar o res
     }
-  }
 
-  // --------------------------
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    (req as any).user = decoded;
+
+    next();
+  } catch (err) {
+    console.error("JWT inválido:", err);
+    res.status(401).json({
+      status: false,
+      code: 401,
+      message: "Token inválido ou expirado",
+      data: null,
+    });
+  }
+}
+
   // Logout
-  // --------------------------
   async handleLogout(req: Request, res: Response, next: NextFunction): Promise<void> {
     res.clearCookie("token", {
       httpOnly: true,
@@ -107,3 +92,48 @@ export class UserMiddleware {
     });
   }
 }
+
+// --------------------------
+// Middlewares de autorização
+// --------------------------
+export const authorizeAdmin = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: "Token não fornecido." });
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+
+    if (decoded.role !== "ADMIN") { 
+      return res.status(403).json({ message: "Acesso negado. Apenas administradores." });
+    }
+
+    (req as any).user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "Token inválido." });
+  }
+};
+
+export const authorizeBarbeiro = (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: "Token não fornecido." });
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+
+    if (decoded.role !== "barbeiro" && decoded.role !== "admin") {
+      return res.status(403).json({ message: "Acesso negado. Apenas barbeiros." });
+    }
+
+    (req as any).user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "Token inválido." });
+  }
+};
