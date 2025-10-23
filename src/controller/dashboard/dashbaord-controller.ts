@@ -68,7 +68,6 @@ export class GetDashboardMetricsController {
         financeiro,
         relatorios: relatoriosData,
       };
-
       res.status(200).json(
         new ResponseTemplateModel(
           true,
