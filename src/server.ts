@@ -11,25 +11,10 @@ import StatusRoute from "./router/status-route";
 
 const server = express();
 
-// =========================
-// Middlewares
-// =========================
+// JSON parser
 server.use(express.json());
 
-// =========================
-// Content Security Policy GLOBAL
-// =========================
-server.use((req: Request, res: Response, next) => {
-  res.setHeader(
-    "Content-Security-Policy",
-    "default-src 'self'; img-src 'self' https://kingsbarber.com.br; script-src 'self'; style-src 'self'; font-src 'self'"
-  );
-  next(); // importante para passar para as rotas
-});
-
-// =========================
 // Rotas da aplicação
-// =========================
 server.use("/api", UserRoute);
 server.use("/api", ProfissionalRoute);
 server.use("/api", AgendamentoRoute);
@@ -39,9 +24,7 @@ server.use("/api", FinanceRoute);
 server.use("/api", RelatorioRoute);
 server.use("/api", StatusRoute);
 
-// =========================
 // Rota raiz de teste
-// =========================
 server.get("/", (req: Request, res: Response) => {
   res.send("🔥 Servidor rodando e rotas carregadas!");
 });
