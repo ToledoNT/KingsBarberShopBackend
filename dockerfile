@@ -1,23 +1,21 @@
-# Base Node.js
-FROM node:20
+FROM node:18
 
-# Diretório de trabalho dentro do container
 WORKDIR /app
 
-# Copia package.json e package-lock.json
 COPY package*.json ./
+COPY tsconfig.json ./
+COPY .env ./
 
-# Instala dependências
-RUN npm install --legacy-peer-deps
+RUN npm install
 
-# Copia todo o código
-COPY . .
+COPY src ./src
+COPY prisma ./prisma
+COPY ssl ./ssl
 
-# Compila TypeScript
+RUN npx prisma generate
+
 RUN npm run build
 
-# Expõe a porta do backend
 EXPOSE 4001
 
-# Comando para rodar o build compilado
-CMD ["npm", "run", "start"]
+CMD ["npm", "start"]

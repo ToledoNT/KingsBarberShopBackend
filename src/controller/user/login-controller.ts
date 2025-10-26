@@ -46,18 +46,16 @@ export class LoginUserController {
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET!,
-        { expiresIn: "1d", algorithm: "HS256" }
+        { expiresIn: "10h", algorithm: "HS256" }
       );
 
-      if (process.env.NODE_ENV === "production") {
-        res.cookie("token", token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-          maxAge: 24 * 60 * 60 * 1000,
-          path: "/",
-        });
-      }
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 10 * 60 * 60 * 1000, 
+        path: "/",
+      });
 
       res.status(200).json({
         status: true,
@@ -68,10 +66,10 @@ export class LoginUserController {
           name: user.name,
           email: user.email,
           role: user.role,
-          token,
         },
       });
-    } catch {
+    } catch (err) {
+      console.error(err);
       res.status(500).json({
         status: false,
         code: 500,

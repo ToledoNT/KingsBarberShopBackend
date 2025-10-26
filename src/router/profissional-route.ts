@@ -16,7 +16,6 @@ const getAllProfessionalsController = new GetAllProfessionalsController();
 const professionalMiddleware = new ProfessionalMiddleware();
 const userMiddleware = new UserMiddleware();
 
-// ✅ Roles permitidas para todas as rotas
 const allowedRoles: UserRole[] = ["ADMIN", "BARBEIRO"];
 
 router.post(

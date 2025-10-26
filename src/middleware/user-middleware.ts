@@ -46,36 +46,34 @@ export class UserMiddleware {
     next();
   }
 
-  // Autenticação JWT
   async handleAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const authHeader = req.headers['authorization'];
-      const token = authHeader?.split(' ')[1];
+  try {
+    const token = req.cookies.token; 
 
-      if (!token) {
-        res.status(401).json({
-          status: false,
-          code: 401,
-          message: "Token não fornecido",
-          data: null,
-        });
-        return;
-      }
-
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-      (req as any).user = decoded;
-
-      next();
-    } catch (err) {
-      console.error("JWT inválido:", err);
+    if (!token) {
       res.status(401).json({
         status: false,
         code: 401,
-        message: "Token inválido ou expirado",
+        message: "Token não fornecido",
         data: null,
       });
+      return;
     }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    (req as any).user = decoded;
+
+    next();
+  } catch (err) {
+    console.error("JWT inválido:", err);
+    res.status(401).json({
+      status: false,
+      code: 401,
+      message: "Token inválido ou expirado",
+      data: null,
+    });
   }
+}
 
   authorizeRoles(...roles: UserRole[]) {
     return (req: Request, res: Response, next: NextFunction) => {
