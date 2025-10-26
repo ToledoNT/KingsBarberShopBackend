@@ -1,5 +1,9 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
+import https from "https";
+import fs from "fs";
+import path from "path";
+
 import UserRoute from "./router/user-route";
 import ProfissionalRoute from "./router/profissional-route";
 import AgendamentoRoute from "./router/agendamentos-admin-route";
@@ -11,12 +15,10 @@ import StatusRoute from "./router/status-route";
 
 const server = express();
 
-// 🔒 Configuração CORS segura
+// CORS
 const allowedOrigins = [
-  "https://www.kingsbarber.com.br",
-  "https://kingsbarber.com.br",
   "http://localhost:3000",
-  "http://192.168.18.129:3000"
+  "http://192.168.18.129:3000",
 ];
 
 server.use(cors({
@@ -32,7 +34,7 @@ server.use(cors({
 
 server.use(express.json());
 
-// 🧩 Rotas da aplicação
+// Rotas
 server.use("/api", UserRoute);
 server.use("/api", ProfissionalRoute);
 server.use("/api", AgendamentoRoute);
@@ -42,14 +44,18 @@ server.use("/api", FinanceRoute);
 server.use("/api", RelatorioRoute);
 server.use("/api", StatusRoute);
 
-// 🔥 Rota raiz de teste
+// Rota raiz
 server.get("/", (req: Request, res: Response) => {
-  res.send("🔥 Servidor rodando e rotas carregadas com sucesso!");
+  res.send("🔥 Servidor HTTPS rodando e rotas carregadas!");
 });
 
-// 🖥️ Apenas HTTP local, o HTTPS será tratado pelo Nginx
-server.listen(4001, () => {
-  console.log("Servidor HTTP rodando em http://localhost:4001");
-});
+// Certificados autoassinados (para teste com IP)
+const sslOptions = {
+  key: fs.readFileSync(path.join(__dirname, "ssl/key.pem")),
+  cert: fs.readFileSync(path.join(__dirname, "ssl/cert.pem")),
+};
 
-export default server;
+// Rodando HTTPS direto no Node
+https.createServer(sslOptions, server).listen(4001, () => {
+  console.log("🔥 Servidor HTTPS rodando em https://SEU_IP:4001");
+});
