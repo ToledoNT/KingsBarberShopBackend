@@ -22,14 +22,11 @@ server.use(cookieParser());
 // =========================
 server.use(
   cors({
-    origin: [
-      "http://localhost:3000",                   
-      "https://kingsbarber.com.br",               
-      "https://51731fff72cd.ngrok-free.app",     
-    ],
-    credentials: true, 
+    origin: true,
+    credentials: true,
   })
 );
+
 
 server.use("/api", UserRoute);
 server.use("/api", ProfissionalRoute);
