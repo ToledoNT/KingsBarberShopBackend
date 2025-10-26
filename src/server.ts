@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import cors from "cors";
 
 import UserRoute from "./router/user-route";
 import ProfissionalRoute from "./router/profissional-route";
@@ -10,6 +11,20 @@ import RelatorioRoute from "./router/dashboard-route";
 import StatusRoute from "./router/status-route";
 
 const server = express();
+
+// =========================
+// 🧩 CORS para testes com ngrok
+// =========================
+server.use(
+  cors({
+    origin: [
+      "http://localhost:5173",         // front local (Vite)
+      "https://kingsbarber.com.br",    // domínio oficial
+      "https://16992f8c5e5e.ngrok-free.app", // substitui pelo link do ngrok
+    ],
+    credentials: true,
+  })
+);
 
 // JSON parser
 server.use(express.json());
