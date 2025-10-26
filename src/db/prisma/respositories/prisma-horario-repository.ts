@@ -1,9 +1,14 @@
 import { PrismaClient, HorarioDisponivel } from "@prisma/client";
 import { ICreateHorario } from "../../../interface/horario/create-horario-interface";
-import { ResponseTemplateInterface } from "../../../interface/response-template-interface";
 import { IUpdateHorario } from "../../../interface/horario/update-horario";
+import { ResponseTemplateInterface } from "../../../interface/response-template-interface";
 
 const prisma = new PrismaClient();
+
+const formatHorario = (h: HorarioDisponivel) => ({
+  ...h,
+  data: h.data.toISOString().split("T")[0],
+});
 
 export class PrismaHorarioRepository {
   async create(horario: ICreateHorario): Promise<ResponseTemplateInterface> {
@@ -28,16 +33,15 @@ export class PrismaHorarioRepository {
 
   async update(id: string, horario: IUpdateHorario): Promise<ResponseTemplateInterface> {
     try {
-      const dataToUpdate: any = {};
-      if (horario.data) dataToUpdate.data = horario.data;
-      if (horario.inicio) dataToUpdate.inicio = horario.inicio;
-      if (horario.fim) dataToUpdate.fim = horario.fim;
-      if (horario.disponivel !== undefined) dataToUpdate.disponivel = horario.disponivel;
-      if (horario.profissionalId) dataToUpdate.profissional = { connect: { id: horario.profissionalId } };
-
       const updated = await prisma.horarioDisponivel.update({
         where: { id },
-        data: dataToUpdate,
+        data: {
+          data: horario.data,
+          inicio: horario.inicio,
+          fim: horario.fim,
+          disponivel: horario.disponivel,
+          profissional: horario.profissionalId ? { connect: { id: horario.profissionalId } } : undefined,
+        },
         include: { profissional: true },
       });
 
@@ -60,17 +64,12 @@ export class PrismaHorarioRepository {
 
   async getAll(): Promise<ResponseTemplateInterface> {
     try {
-      const horarios: HorarioDisponivel[] = await prisma.horarioDisponivel.findMany({
+      const horarios = await prisma.horarioDisponivel.findMany({
         include: { profissional: true },
         orderBy: { data: "asc" },
       });
 
-      const formatted = horarios.map((h: HorarioDisponivel) => ({
-        ...h,
-        data: h.data.toISOString().split("T")[0],
-      }));
-
-      return { status: true, code: 200, message: "Horários disponíveis carregados com sucesso.", data: formatted };
+      return { status: true, code: 200, message: "Horários disponíveis carregados com sucesso.", data: horarios.map(formatHorario) };
     } catch (err: any) {
       console.error("Erro ao buscar horários:", err.message);
       return { status: false, code: 500, message: "Erro ao buscar horários disponíveis.", data: [], error: err.message };
@@ -79,22 +78,17 @@ export class PrismaHorarioRepository {
 
   async getByBarbeiro(profissionalId: string): Promise<ResponseTemplateInterface> {
     try {
-      const horarios: HorarioDisponivel[] = await prisma.horarioDisponivel.findMany({
+      const horarios = await prisma.horarioDisponivel.findMany({
         where: { profissionalId },
         include: { profissional: true },
         orderBy: { data: "asc" },
       });
 
-      const formatted = horarios.map((h: HorarioDisponivel) => ({
-        ...h,
-        data: h.data.toISOString().split("T")[0],
-      }));
-
       return {
         status: true,
         code: 200,
         message: `Horários do profissional ${profissionalId} carregados com sucesso.`,
-        data: formatted,
+        data: horarios.map(formatHorario),
       };
     } catch (err: any) {
       console.error("Erro ao buscar horários do profissional:", err.message);
@@ -111,7 +105,7 @@ export class PrismaHorarioRepository {
 
       if (!horario) return { status: false, code: 404, message: "Horário não encontrado.", data: [] };
 
-      return { status: true, code: 200, message: "Horário encontrado com sucesso.", data: horario };
+      return { status: true, code: 200, message: "Horário encontrado com sucesso.", data: formatHorario(horario) };
     } catch (err: any) {
       console.error("Erro ao buscar horário por ID:", err.message);
       return { status: false, code: 500, message: "Erro ao buscar horário por ID.", data: [], error: err.message };
