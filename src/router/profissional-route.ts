@@ -42,10 +42,9 @@ router.delete(
   deleteProfessionalController.handle.bind(deleteProfessionalController)
 );
 
+// Rota pública para pegar todos os profissionais
 router.get(
-  "/profissional/getall",
-  userMiddleware.handleAuth.bind(userMiddleware),
-  userMiddleware.authorizeRoles(...allowedRoles),
+  "/profissional/getall-public",
   getAllProfessionalsController.handle.bind(getAllProfessionalsController)
 );
 
