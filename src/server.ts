@@ -6,17 +6,19 @@ import AgendamentoRoute from "./router/agendamentos-admin-route";
 import ProcedimentoRoute from "./router/procedimentos-route";
 import HorarioRoute from "./router/horario-router";
 import FinanceRoute from "./router/financeiro-route";
-import RelatorioRoute from "./router/dashboard-route"
+import RelatorioRoute from "./router/dashboard-route";
+import StatusRoute from "./router/status-route";
 
 const server = express();
 
 /**
  * 🔒 Configuração segura do CORS
- * Permite chamadas do frontend tanto localmente quanto via rede
  */
 const allowedOrigins = [
-  "http://localhost:3000",          // quando estiver testando no mesmo PC
-  "http://192.168.18.129:3000",     // quando acessar de outro dispositivo
+  "https://www.kingsbarber.com.br",
+  "https://kingsbarber.com.br",
+  "http://localhost:3000",
+  "http://192.168.18.129:3000" 
 ];
 
 server.use(
@@ -34,14 +36,15 @@ server.use(
 
 server.use(express.json());
 
-// 🧩 Suas rotas originais
+// 🧩 Rotas da aplicação
 server.use("/api", UserRoute);
 server.use("/api", ProfissionalRoute);
 server.use("/api", AgendamentoRoute);
 server.use("/api", ProcedimentoRoute);
 server.use("/api", HorarioRoute);
 server.use("/api", FinanceRoute);
-server.use("/api", RelatorioRoute)
+server.use("/api", RelatorioRoute);
+server.use("/api", StatusRoute);
 
 // 🔥 Rota raiz de teste
 server.get("/", (req: Request, res: Response) => {
