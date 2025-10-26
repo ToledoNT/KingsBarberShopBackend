@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import helmet from "helmet";
 
 import UserRoute from "./router/user-route";
 import ProfissionalRoute from "./router/profissional-route";
@@ -18,19 +17,15 @@ const server = express();
 server.use(express.json());
 
 // =========================
-// Content Security Policy
+// Content Security Policy GLOBAL
 // =========================
-server.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"], // permite recursos do mesmo domínio
-      imgSrc: ["'self'", "https://kingsbarber.com.br"], // favicon e imagens
-      scriptSrc: ["'self'"], // scripts do domínio
-      styleSrc: ["'self'"], // CSS do domínio
-      fontSrc: ["'self'"] // fontes do domínio
-    }
-  })
-);
+server.use((req: Request, res: Response, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; img-src 'self' https://kingsbarber.com.br; script-src 'self'; style-src 'self'; font-src 'self'"
+  );
+  next(); // importante para passar para as rotas
+});
 
 // =========================
 // Rotas da aplicação
