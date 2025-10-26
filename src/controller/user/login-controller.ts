@@ -1,6 +1,7 @@
-import type { Request, Response } from "express";
+import express, { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import rateLimit from "express-rate-limit"; // <- adicionado
 import { GetUserByEmailUseCase } from "../../use-case/user/get-user-by-email-use-case";
 
 export class LoginUserController {
@@ -79,3 +80,14 @@ export class LoginUserController {
     }
   }
 }
+
+// --- Aplicando Rate Limiting na rota de login ---
+export const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 5, // 5 tentativas por IP
+  message: {
+    status: false,
+    code: 429,
+    message: "Muitas tentativas de login. Tente novamente mais tarde.",
+  },
+});

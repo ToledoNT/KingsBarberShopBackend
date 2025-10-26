@@ -1,8 +1,4 @@
 import express, { Request, Response } from "express";
-import cors from "cors";
-import https from "https";
-import fs from "fs";
-import path from "path";
 
 import UserRoute from "./router/user-route";
 import ProfissionalRoute from "./router/profissional-route";
@@ -15,26 +11,10 @@ import StatusRoute from "./router/status-route";
 
 const server = express();
 
-// CORS
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://192.168.18.129:3000",
-];
-
-server.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Origem não permitida pelo CORS"));
-    }
-  },
-  credentials: true,
-}));
-
+// JSON parser
 server.use(express.json());
 
-// Rotas
+// Rotas da aplicação
 server.use("/api", UserRoute);
 server.use("/api", ProfissionalRoute);
 server.use("/api", AgendamentoRoute);
@@ -44,18 +24,9 @@ server.use("/api", FinanceRoute);
 server.use("/api", RelatorioRoute);
 server.use("/api", StatusRoute);
 
-// Rota raiz
+// Rota raiz de teste
 server.get("/", (req: Request, res: Response) => {
-  res.send("🔥 Servidor HTTPS rodando e rotas carregadas!");
+  res.send("🔥 Servidor rodando e rotas carregadas!");
 });
 
-// Certificados autoassinados (para teste com IP)
-const sslOptions = {
-  key: fs.readFileSync(path.join(__dirname, "ssl/key.pem")),
-  cert: fs.readFileSync(path.join(__dirname, "ssl/cert.pem")),
-};
-
-// Rodando HTTPS direto no Node
-https.createServer(sslOptions, server).listen(4001, () => {
-  console.log("🔥 Servidor HTTPS rodando em https://SEU_IP:4001");
-});
+export default server;
