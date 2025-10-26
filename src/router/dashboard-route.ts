@@ -1,15 +1,17 @@
 import express from "express";
 import { GetDashboardMetricsController } from "../controller/dashboard/dashbaord-controller";
-import { UserMiddleware, authorizeAdmin, authorizeBarbeiro } from "../middleware/user-middleware";
+import { UserMiddleware } from "../middleware/user-middleware";
+import { UserRole } from "../interface/user/create-user-interface";
 
 const router = express.Router();
 const userMiddleware = new UserMiddleware();
 const getDashboardController = new GetDashboardMetricsController();
 
+// Somente ADMIN pode acessar
 router.get(
   "/dashboard/metrics",
-  userMiddleware.handleAuth.bind(userMiddleware), 
-  authorizeAdmin,                                 
+  userMiddleware.handleAuth.bind(userMiddleware),
+  userMiddleware.authorizeRoles("ADMIN" as UserRole), // ✅ chama o método do middleware
   getDashboardController.handle.bind(getDashboardController)
 );
 

@@ -46,21 +46,19 @@ export class LoginUserController {
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET!,
-        { expiresIn: "1d" }
+        { expiresIn: "1d", algorithm: "HS256" }
       );
 
-      // 🔑 Cookie comentado (mantido para referência futura)
-      /*
-      res.cookie("token", token, {
-        httpOnly: true,   // 🔹 Protege contra JS no front
-        secure: false,    // 🔹 false em dev/localhost, true em produção
-        sameSite: "lax",  // 🔹 "lax" ou "strict"
-        maxAge: 24 * 60 * 60 * 1000,
-        path: "/",
-      });
-      */
+      if (process.env.NODE_ENV === "production") {
+        res.cookie("token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+          maxAge: 24 * 60 * 60 * 1000,
+          path: "/",
+        });
+      }
 
-      // ✅ Retorno de sucesso com token e role
       res.status(200).json({
         status: true,
         code: 200,
@@ -69,12 +67,11 @@ export class LoginUserController {
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role, 
+          role: user.role,
           token,
         },
       });
-    } catch (err) {
-      console.error("Erro no login:", err);
+    } catch {
       res.status(500).json({
         status: false,
         code: 500,

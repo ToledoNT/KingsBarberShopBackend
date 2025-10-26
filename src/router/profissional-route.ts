@@ -4,6 +4,8 @@ import { UpdateProfessionalController } from "../controller/profissional/update-
 import { DeleteProfessionalController } from "../controller/profissional/delete-profissional-controller";
 import { GetAllProfessionalsController } from "../controller/profissional/get-all-profissional-controller";
 import { ProfessionalMiddleware } from "../middleware/profissional-middleware";
+import { UserMiddleware } from "../middleware/user-middleware";
+import { UserRole } from "../interface/user/create-user-interface";
 
 const router = express.Router();
 
@@ -12,31 +14,39 @@ const updateProfessionalController = new UpdateProfessionalController();
 const deleteProfessionalController = new DeleteProfessionalController();
 const getAllProfessionalsController = new GetAllProfessionalsController();
 const professionalMiddleware = new ProfessionalMiddleware();
+const userMiddleware = new UserMiddleware();
 
-// ✅ CREATE
+// ✅ Roles permitidas para todas as rotas
+const allowedRoles: UserRole[] = ["ADMIN", "BARBEIRO"];
+
 router.post(
   "/profissional/create",
+  userMiddleware.handleAuth.bind(userMiddleware),
+  userMiddleware.authorizeRoles(...allowedRoles),
   professionalMiddleware.handleCreateProfessional.bind(professionalMiddleware),
   createProfessionalController.handle.bind(createProfessionalController)
 );
 
-// ✅ UPDATE
 router.put(
   "/profissional/update/:id",
+  userMiddleware.handleAuth.bind(userMiddleware),
+  userMiddleware.authorizeRoles(...allowedRoles),
   professionalMiddleware.handleUpdateProfessional.bind(professionalMiddleware),
   updateProfessionalController.handle.bind(updateProfessionalController)
 );
 
-// ✅ DELETE
 router.delete(
   "/profissional/delete/:id",
+  userMiddleware.handleAuth.bind(userMiddleware),
+  userMiddleware.authorizeRoles(...allowedRoles),
   professionalMiddleware.handleDeleteProfessional.bind(professionalMiddleware),
   deleteProfessionalController.handle.bind(deleteProfessionalController)
 );
 
-// ✅ GET ALL
 router.get(
   "/profissional/getall",
+  userMiddleware.handleAuth.bind(userMiddleware),
+  userMiddleware.authorizeRoles(...allowedRoles),
   getAllProfessionalsController.handle.bind(getAllProfessionalsController)
 );
 

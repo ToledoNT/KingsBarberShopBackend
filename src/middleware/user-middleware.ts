@@ -1,7 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { UserRole } from "../interface/user/create-user-interface";
 
 export class UserMiddleware {
+  // Validação de criação de usuário
   async handleCreateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { name, email, password } = req.body;
     const missingFields: string[] = [];
@@ -23,7 +25,7 @@ export class UserMiddleware {
     next();
   }
 
-  // Valida login
+  // Validação de login
   async handleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { email, password } = req.body;
     const missingFields: string[] = [];
@@ -44,36 +46,53 @@ export class UserMiddleware {
     next();
   }
 
-// Autenticação JWT
-async handleAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader?.split(' ')[1]; 
+  // Autenticação JWT
+  async handleAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const authHeader = req.headers['authorization'];
+      const token = authHeader?.split(' ')[1];
 
-    if (!token) {
+      if (!token) {
+        res.status(401).json({
+          status: false,
+          code: 401,
+          message: "Token não fornecido",
+          data: null,
+        });
+        return;
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+      (req as any).user = decoded;
+
+      next();
+    } catch (err) {
+      console.error("JWT inválido:", err);
       res.status(401).json({
         status: false,
         code: 401,
-        message: "Token não fornecido",
+        message: "Token inválido ou expirado",
         data: null,
       });
-      return; // apenas return para sair da função, sem retornar o res
     }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    (req as any).user = decoded;
-
-    next();
-  } catch (err) {
-    console.error("JWT inválido:", err);
-    res.status(401).json({
-      status: false,
-      code: 401,
-      message: "Token inválido ou expirado",
-      data: null,
-    });
   }
-}
+
+  authorizeRoles(...roles: UserRole[]) {
+    return (req: Request, res: Response, next: NextFunction) => {
+      const user = (req as any).user;
+
+      if (!user) {
+        return res.status(401).json({ message: "Token não fornecido." });
+      }
+
+      // padronizando role para maiúsculas
+      if (!roles.includes(user.role.toUpperCase() as UserRole)) {
+        return res.status(403).json({ message: "Acesso negado." });
+      }
+
+      next();
+    };
+  }
 
   // Logout
   async handleLogout(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -92,48 +111,3 @@ async handleAuth(req: Request, res: Response, next: NextFunction): Promise<void>
     });
   }
 }
-
-// --------------------------
-// Middlewares de autorização
-// --------------------------
-export const authorizeAdmin = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ message: "Token não fornecido." });
-  }
-
-  const token = authHeader.split(" ")[1];
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-
-    if (decoded.role !== "ADMIN") { 
-      return res.status(403).json({ message: "Acesso negado. Apenas administradores." });
-    }
-
-    (req as any).user = decoded;
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: "Token inválido." });
-  }
-};
-
-export const authorizeBarbeiro = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ message: "Token não fornecido." });
-  }
-
-  const token = authHeader.split(" ")[1];
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-
-    if (decoded.role !== "barbeiro" && decoded.role !== "admin") {
-      return res.status(403).json({ message: "Acesso negado. Apenas barbeiros." });
-    }
-
-    (req as any).user = decoded;
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: "Token inválido." });
-  }
-};
