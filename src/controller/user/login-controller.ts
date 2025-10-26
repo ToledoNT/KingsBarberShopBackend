@@ -82,12 +82,16 @@ export class LoginUserController {
 }
 
 // --- Aplicando Rate Limiting na rota de login ---
+// Limite de tentativas de login
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5, // 5 tentativas por IP
-  message: {
-    status: false,
-    code: 429,
-    message: "Muitas tentativas de login. Tente novamente mais tarde.",
+  max: 5, // máximo de 5 tentativas
+  handler: (req: Request, res: Response) => {
+    res.status(429).json({
+      status: false,
+      code: 429,
+      message: "Muitas tentativas de login. Tente novamente mais tarde.",
+      data: null,
+    });
   },
 });

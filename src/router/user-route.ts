@@ -1,5 +1,4 @@
 import express, { type RequestHandler } from "express";
-import rateLimit from "express-rate-limit";
 import { UserMiddleware } from "../middleware/user-middleware";
 import { CreateUserController } from "../controller/user/create-user-controller";
 import { LoginUserController } from "../controller/user/login-controller";
@@ -13,17 +12,6 @@ const userMiddleware = new UserMiddleware();
 
 const router = express.Router();
 
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,                   
-  message: {
-    status: false,
-    code: 429,
-    message: "Muitas tentativas de login. Tente novamente mais tarde.",
-    data: null,
-  },
-});
-
 router.post(
   "/auth/register",
   userMiddleware.handleCreateUser.bind(userMiddleware) as RequestHandler,
@@ -32,7 +20,7 @@ router.post(
 
 router.post(
   "/auth/login",
-  loginLimiter, 
+  userMiddleware.loginLimiter, 
   userMiddleware.handleLogin.bind(userMiddleware) as RequestHandler,
   loginUserController.handle.bind(loginUserController) as RequestHandler
 );

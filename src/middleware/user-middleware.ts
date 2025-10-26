@@ -1,8 +1,25 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { UserRole } from "../interface/user/create-user-interface";
+import rateLimit from "express-rate-limit";
 
 export class UserMiddleware {
+  // Rate Limiter para login
+  public loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 5, // máximo de 5 tentativas
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req: Request, res: Response) => {
+      res.status(429).json({
+        status: false,
+        code: 429,
+        message: "Muitas tentativas de login. Tente novamente mais tarde.",
+        data: null,
+      });
+    },
+  });
+
   // Validação de criação de usuário
   async handleCreateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { name, email, password } = req.body;
@@ -47,34 +64,35 @@ export class UserMiddleware {
   }
 
   async handleAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
-  try {
-    const token = req.cookies.token; 
+    try {
+      const token = req.cookies.token;
 
-    if (!token) {
+      if (!token) {
+        res.status(401).json({
+          status: false,
+          code: 401,
+          message: "Token não fornecido",
+          data: null,
+        });
+        return;
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+      (req as any).user = decoded;
+
+      next();
+    } catch (err) {
+      console.error("JWT inválido:", err);
       res.status(401).json({
         status: false,
         code: 401,
-        message: "Token não fornecido",
+        message: "Token inválido ou expirado",
         data: null,
       });
-      return;
     }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    (req as any).user = decoded;
-
-    next();
-  } catch (err) {
-    console.error("JWT inválido:", err);
-    res.status(401).json({
-      status: false,
-      code: 401,
-      message: "Token inválido ou expirado",
-      data: null,
-    });
   }
-}
 
+  // Autorização por roles
   authorizeRoles(...roles: UserRole[]) {
     return (req: Request, res: Response, next: NextFunction) => {
       const user = (req as any).user;
@@ -83,7 +101,6 @@ export class UserMiddleware {
         return res.status(401).json({ message: "Token não fornecido." });
       }
 
-      // padronizando role para maiúsculas
       if (!roles.includes(user.role.toUpperCase() as UserRole)) {
         return res.status(403).json({ message: "Acesso negado." });
       }
