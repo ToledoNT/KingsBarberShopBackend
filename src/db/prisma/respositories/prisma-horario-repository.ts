@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, HorarioDisponivel } from "@prisma/client";
 import { ICreateHorario } from "../../../interface/horario/create-horario-interface";
 import { ResponseTemplateInterface } from "../../../interface/response-template-interface";
 import { IUpdateHorario } from "../../../interface/horario/update-horario";
@@ -60,12 +60,15 @@ export class PrismaHorarioRepository {
 
   async getAll(): Promise<ResponseTemplateInterface> {
     try {
-      const horarios = await prisma.horarioDisponivel.findMany({
+      const horarios: HorarioDisponivel[] = await prisma.horarioDisponivel.findMany({
         include: { profissional: true },
         orderBy: { data: "asc" },
       });
 
-      const formatted = horarios.map(h => ({ ...h, data: h.data.toISOString().split("T")[0] }));
+      const formatted = horarios.map((h: HorarioDisponivel) => ({
+        ...h,
+        data: h.data.toISOString().split("T")[0],
+      }));
 
       return { status: true, code: 200, message: "Horários disponíveis carregados com sucesso.", data: formatted };
     } catch (err: any) {
@@ -76,13 +79,16 @@ export class PrismaHorarioRepository {
 
   async getByBarbeiro(profissionalId: string): Promise<ResponseTemplateInterface> {
     try {
-      const horarios = await prisma.horarioDisponivel.findMany({
+      const horarios: HorarioDisponivel[] = await prisma.horarioDisponivel.findMany({
         where: { profissionalId },
         include: { profissional: true },
         orderBy: { data: "asc" },
       });
 
-      const formatted = horarios.map(h => ({ ...h, data: h.data.toISOString().split("T")[0] }));
+      const formatted = horarios.map((h: HorarioDisponivel) => ({
+        ...h,
+        data: h.data.toISOString().split("T")[0],
+      }));
 
       return {
         status: true,
