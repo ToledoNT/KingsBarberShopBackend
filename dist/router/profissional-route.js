@@ -1,0 +1,25 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const create_profissional_controller_1 = require("../controller/profissional/create-profissional-controller");
+const update_profissional_controller_1 = require("../controller/profissional/update-profissional-controller");
+const delete_profissional_controller_1 = require("../controller/profissional/delete-profissional-controller");
+const get_all_profissional_controller_1 = require("../controller/profissional/get-all-profissional-controller");
+const profissional_middleware_1 = require("../middleware/profissional-middleware");
+const user_middleware_1 = require("../middleware/user-middleware");
+const router = express_1.default.Router();
+const createProfessionalController = new create_profissional_controller_1.CreateProfessionalController();
+const updateProfessionalController = new update_profissional_controller_1.UpdateProfessionalController();
+const deleteProfessionalController = new delete_profissional_controller_1.DeleteProfessionalController();
+const getAllProfessionalsController = new get_all_profissional_controller_1.GetAllProfessionalsController();
+const professionalMiddleware = new profissional_middleware_1.ProfessionalMiddleware();
+const userMiddleware = new user_middleware_1.UserMiddleware();
+const allowedRoles = ["ADMIN", "BARBEIRO"];
+router.post("/profissional/create", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), professionalMiddleware.handleCreateProfessional.bind(professionalMiddleware), createProfessionalController.handle.bind(createProfessionalController));
+router.put("/profissional/update/:id", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), professionalMiddleware.handleUpdateProfessional.bind(professionalMiddleware), updateProfessionalController.handle.bind(updateProfessionalController));
+router.delete("/profissional/delete/:id", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), professionalMiddleware.handleDeleteProfessional.bind(professionalMiddleware), deleteProfessionalController.handle.bind(deleteProfessionalController));
+router.get("/profissional/getall", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), getAllProfessionalsController.handle.bind(getAllProfessionalsController));
+exports.default = router;

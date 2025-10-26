@@ -1,0 +1,25 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const create_agendamento_controller_1 = require("../controller/appointments/create-agendamento-controller");
+const update_agendamento_controller_1 = require("../controller/appointments/update-agendamento-controller");
+const delete_agendamento_controller_1 = require("../controller/appointments/delete-agendamento-controller");
+const get_all_agendamentos_controler_1 = require("../controller/appointments/get-all-agendamentos-controler");
+const agendamento_middleware_1 = require("../middleware/agendamento-middleware");
+const user_middleware_1 = require("../middleware/user-middleware");
+const createAppointmentController = new create_agendamento_controller_1.CreateAppointmentController();
+const updateAppointmentController = new update_agendamento_controller_1.UpdateAppointmentController();
+const deleteAppointmentController = new delete_agendamento_controller_1.DeleteAppointmentController();
+const getAllAppointmentsController = new get_all_agendamentos_controler_1.GetAllAppointmentsController();
+const appointmentMiddleware = new agendamento_middleware_1.AppointmentMiddleware();
+const userMiddleware = new user_middleware_1.UserMiddleware();
+const router = express_1.default.Router();
+const allowedRoles = ["ADMIN", "BARBEIRO"];
+router.post("/appointment/create", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), appointmentMiddleware.handleCreateAppointment.bind(appointmentMiddleware), createAppointmentController.handle.bind(createAppointmentController));
+router.put("/appointment/update", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), appointmentMiddleware.handleUpdateAppointment.bind(appointmentMiddleware), updateAppointmentController.handle.bind(updateAppointmentController));
+router.delete("/appointment/delete/:id", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), appointmentMiddleware.handleDeleteAppointment.bind(appointmentMiddleware), deleteAppointmentController.handle.bind(deleteAppointmentController));
+router.get("/appointment/all", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), getAllAppointmentsController.handle.bind(getAllAppointmentsController));
+exports.default = router;

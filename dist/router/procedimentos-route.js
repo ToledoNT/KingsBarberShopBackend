@@ -1,0 +1,25 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const procedimento_middleware_1 = require("../middleware/procedimento-middleware");
+const get_all_procedimento_controller_1 = require("../controller/procedimentos/get-all-procedimento-controller");
+const delete_procedimento_controller_1 = require("../controller/procedimentos/delete-procedimento-controller");
+const update_procedimento_controller_1 = require("../controller/procedimentos/update-procedimento-controller");
+const create_procedimento_controller_1 = require("../controller/procedimentos/create-procedimento-controller");
+const user_middleware_1 = require("../middleware/user-middleware");
+const router = express_1.default.Router();
+const createProcedimentoController = new create_procedimento_controller_1.CreateProcedimentoController();
+const updateProcedimentoController = new update_procedimento_controller_1.UpdateProcedimentoController();
+const deleteProcedimentoController = new delete_procedimento_controller_1.DeleteProcedimentoController();
+const getAllProcedimentosController = new get_all_procedimento_controller_1.GetAllProcedimentosController();
+const procedimentoMiddleware = new procedimento_middleware_1.ProcedimentoMiddleware();
+const userMiddleware = new user_middleware_1.UserMiddleware();
+const allowedRoles = ["ADMIN", "BARBEIRO"];
+router.post("/procedimento/create", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), procedimentoMiddleware.handleCreateProcedimento.bind(procedimentoMiddleware), createProcedimentoController.handle.bind(createProcedimentoController));
+router.put("/procedimento/update/:id", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), procedimentoMiddleware.handleUpdateProcedimento.bind(procedimentoMiddleware), updateProcedimentoController.handle.bind(updateProcedimentoController));
+router.delete("/procedimento/delete/:id", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), procedimentoMiddleware.handleDeleteProcedimento.bind(procedimentoMiddleware), deleteProcedimentoController.handle.bind(deleteProcedimentoController));
+router.get("/procedimento/getall", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), getAllProcedimentosController.handle.bind(getAllProcedimentosController));
+exports.default = router;
