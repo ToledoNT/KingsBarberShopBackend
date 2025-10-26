@@ -13,10 +13,8 @@ import StatusRoute from "./router/status-route";
 
 const server = express();
 
-// Parser para JSON
 server.use(express.json());
 
-// Parser para cookies
 server.use(cookieParser());
 
 // =========================
@@ -25,14 +23,14 @@ server.use(cookieParser());
 server.use(
   cors({
     origin: [
-      "http://localhost:5173",      // front local (Vite/Next)
-      "https://kingsbarber.com.br", // domínio oficial
+      "http://localhost:3000",                   
+      "https://kingsbarber.com.br",               
+      "https://51731fff72cd.ngrok-free.app",     
     ],
-    credentials: true, // ESSENCIAL para enviar cookies
+    credentials: true, 
   })
 );
 
-// Rotas
 server.use("/api", UserRoute);
 server.use("/api", ProfissionalRoute);
 server.use("/api", AgendamentoRoute);
