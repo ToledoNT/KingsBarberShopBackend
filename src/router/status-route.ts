@@ -9,8 +9,6 @@ const router = express.Router();
    ============================ */
 router.get(
   "/status",
-  // Se quiser proteger com token, descomente a linha abaixo
-  // userMiddleware.handleAuth.bind(userMiddleware) as RequestHandler,
   (req: Request, res: Response) => {
     res.status(200).json({
       status: true,
