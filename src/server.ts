@@ -20,7 +20,7 @@ server.use(
     origin: [
       "http://localhost:5173",         // front local (Vite)
       "https://kingsbarber.com.br",    // domínio oficial
-      "https://16992f8c5e5e.ngrok-free.app", // substitui pelo link do ngrok
+      "https://d452a4b4d8dd.ngrok-free.app", // substitui pelo link do ngrok
     ],
     credentials: true,
   })
