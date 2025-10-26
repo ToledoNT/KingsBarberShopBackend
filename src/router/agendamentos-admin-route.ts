@@ -44,8 +44,6 @@ router.delete(
 
 router.get(
   "/appointment/all",
-  userMiddleware.handleAuth.bind(userMiddleware),
-  userMiddleware.authorizeRoles(...allowedRoles),
   getAllAppointmentsController.handle.bind(getAllAppointmentsController) as RequestHandler
 );
 

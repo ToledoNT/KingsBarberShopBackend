@@ -47,9 +47,7 @@ router.delete(
 
 router.get(
   "/horario/getall",
-  userMiddleware.handleAuth.bind(userMiddleware),
-  userMiddleware.authorizeRoles(...allowedRoles),
-  getAllHorariosController.handle.bind(getAllHorariosController) as RequestHandler
+  getAllHorariosController.handle.bind(getAllHorariosController)
 );
 
 /* ============================
