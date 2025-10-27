@@ -14,20 +14,33 @@ import StatusRoute from "./router/status-route";
 const server = express();
 
 server.use(express.json());
-
 server.use(cookieParser());
 
 // =========================
 // 🧩 CORS configurado
 // =========================
+const allowedOrigins = [
+  "https://www.kingsbarber.com.br",
+  "https://kingsbarber.com.br",
+  "http://localhost:3000", 
+];
+
 server.use(
   cors({
-    origin: true,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
 
-
+// =========================
+// Rotas
+// =========================
 server.use("/api", UserRoute);
 server.use("/api", ProfissionalRoute);
 server.use("/api", AgendamentoRoute);
