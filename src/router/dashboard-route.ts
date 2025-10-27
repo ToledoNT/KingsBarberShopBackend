@@ -11,7 +11,7 @@ const getDashboardController = new GetDashboardMetricsController();
 router.get(
   "/dashboard/metrics",
   userMiddleware.handleAuth.bind(userMiddleware),
-  userMiddleware.authorizeRoles("ADMIN" as UserRole), // ✅ chama o método do middleware
+  userMiddleware.authorizeRoles("ADMIN" as UserRole), 
   getDashboardController.handle.bind(getDashboardController)
 );
 

@@ -3,7 +3,7 @@ import { CreateAppointmentController } from "../controller/appointments/create-a
 import { UpdateAppointmentController } from "../controller/appointments/update-agendamento-controller";
 import { DeleteAppointmentController } from "../controller/appointments/delete-agendamento-controller";
 import { GetAllAppointmentsController } from "../controller/appointments/get-all-agendamentos-controler";
-import { AppointmentMiddleware } from "../middleware/agendamento-middleware";
+import { AppointmentMiddleware } from "../middleware/agendamento-middleware";  // Este é o middleware que valida a criação do agendamento
 import { UserMiddleware } from "../middleware/user-middleware";
 import { UserRole } from "../interface/user/create-user-interface";
 
@@ -11,7 +11,7 @@ const createAppointmentController = new CreateAppointmentController();
 const updateAppointmentController = new UpdateAppointmentController();
 const deleteAppointmentController = new DeleteAppointmentController();
 const getAllAppointmentsController = new GetAllAppointmentsController();
-const appointmentMiddleware = new AppointmentMiddleware();
+const appointmentMiddleware = new AppointmentMiddleware();  // Usando o middleware de agendamento
 const userMiddleware = new UserMiddleware();
 
 const router = express.Router();
@@ -19,9 +19,10 @@ const router = express.Router();
 // Definindo os papéis permitidos para as rotas protegidas
 const allowedRoles: UserRole[] = ["ADMIN", "BARBEIRO"];
 
-// Rota sem proteção, qualquer usuário pode criar agendamento
+// Rota para criar um agendamento (validação com middleware)
 router.post(
   "/appointment/create",
+  appointmentMiddleware.handleCreateAppointment,  
   createAppointmentController.handle.bind(createAppointmentController) as RequestHandler
 );
 

@@ -23,7 +23,6 @@ export class UserMiddleware {
     },
   });
 
-  // Validação de criação de usuário
   async handleCreateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { name, email, password } = req.body;
     const missingFields = ["name", "email", "password"].filter(field => !req.body[field]);
@@ -104,12 +103,12 @@ export class UserMiddleware {
 
       if (!user) {
         res.status(401).json({ message: "Token não fornecido." });
-        return; // Interrompe o fluxo após o envio da resposta
+        return; 
       }
 
       if (!roles.includes(user.role.toUpperCase() as UserRole)) {
         res.status(403).json({ message: "Acesso negado." });
-        return; // Interrompe o fluxo após o envio da resposta
+        return; 
       }
 
       next(); // Prossegue se o role estiver correto
