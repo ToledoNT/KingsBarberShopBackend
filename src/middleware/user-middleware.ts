@@ -13,8 +13,6 @@ export class UserMiddleware {
   public loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
     max: 5, // máximo de 5 tentativas
-    standardHeaders: true,
-    legacyHeaders: false,
     handler: (req: Request, res: Response) => {
       res.status(429).json({
         status: false,
@@ -41,13 +39,11 @@ export class UserMiddleware {
         message: `Campos obrigatórios faltando: ${missingFields.join(", ")}`,
         data: null,
       });
-      return;  // Interrompe a execução aqui se houver erro
+    } else {
+      next(); 
     }
-
-    next(); // Se os dados estiverem ok, passa para o próximo middleware
   }
 
-  // Validação de login
   async handleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { email, password } = req.body;
     const missingFields: string[] = [];
@@ -62,10 +58,9 @@ export class UserMiddleware {
         message: `Campos obrigatórios faltando: ${missingFields.join(", ")}`,
         data: null,
       });
-      return;  // Interrompe a execução aqui se houver erro
+    } else {
+      next(); // Se os dados estiverem ok, passa para o próximo middleware
     }
-
-    next();
   }
 
   // Validação e verificação de token
@@ -80,7 +75,7 @@ export class UserMiddleware {
           message: "Token não fornecido",
           data: null,
         });
-        return;  // Interrompe a execução aqui se não houver token
+        return;  // Interrompe o fluxo se o token não for fornecido
       }
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
@@ -93,11 +88,11 @@ export class UserMiddleware {
           message: "Token inválido ou incompleto",
           data: null,
         });
-        return;  // Interrompe a execução aqui se o token for inválido
+        return;  // Interrompe o fluxo se o token for inválido ou incompleto
       }
 
-      req.user = decoded; // Adiciona o usuário ao request
-      next();
+      req.user = decoded; // Armazena as informações do usuário no request
+      next(); // Prossegue para o próximo middleware
     } catch (err) {
       console.error("JWT inválido:", err);
       res.status(401).json({
@@ -111,19 +106,16 @@ export class UserMiddleware {
 
   // Autorização por roles
   authorizeRoles(...roles: UserRole[]) {
-    return (req: RequestWithUser, res: Response, next: NextFunction) => {
+    return (req: RequestWithUser, res: Response, next: NextFunction): void => {
       const user = req.user;
 
       if (!user) {
-        return res.status(401).json({ message: "Token não fornecido." });
+        res.status(401).json({ message: "Token não fornecido." });
+      } else if (!roles.includes(user.role.toUpperCase() as UserRole)) {
+        res.status(403).json({ message: "Acesso negado." });
+      } else {
+        next(); // Prossegue se o role estiver correto
       }
-
-      // Verificação de role em maiúsculas
-      if (!roles.includes(user.role.toUpperCase() as UserRole)) {
-        return res.status(403).json({ message: "Acesso negado." });
-      }
-
-      next();
     };
   }
 
