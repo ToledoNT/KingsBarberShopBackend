@@ -20,9 +20,6 @@ const allowedRoles: UserRole[] = ["ADMIN", "BARBEIRO"];
 
 router.post(
   "/appointment/create",
-  userMiddleware.handleAuth.bind(userMiddleware),
-  userMiddleware.authorizeRoles(...allowedRoles),
-  appointmentMiddleware.handleCreateAppointment.bind(appointmentMiddleware) as RequestHandler,
   createAppointmentController.handle.bind(createAppointmentController) as RequestHandler
 );
 
