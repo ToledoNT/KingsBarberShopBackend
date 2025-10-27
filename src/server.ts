@@ -13,6 +13,9 @@ import StatusRoute from "./router/status-route";
 
 const server = express();
 
+// 🔹 Habilitar trust proxy para funcionar corretamente atrás do Nginx
+server.set("trust proxy", 1);
+
 server.use(express.json());
 server.use(cookieParser());
 
@@ -22,18 +25,12 @@ server.use(cookieParser());
 const allowedOrigins = [
   "https://www.kingsbarber.com.br",
   "https://kingsbarber.com.br",
-  "http://localhost:3000", 
+  "http://localhost:3000",
 ];
 
 server.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: allowedOrigins,
     credentials: true,
   })
 );
