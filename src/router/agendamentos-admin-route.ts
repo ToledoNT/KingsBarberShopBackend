@@ -16,13 +16,16 @@ const userMiddleware = new UserMiddleware();
 
 const router = express.Router();
 
+// Definindo os papéis permitidos para as rotas protegidas
 const allowedRoles: UserRole[] = ["ADMIN", "BARBEIRO"];
 
+// Rota sem proteção, qualquer usuário pode criar agendamento
 router.post(
   "/appointment/create",
   createAppointmentController.handle.bind(createAppointmentController) as RequestHandler
 );
 
+// Rota para atualizar o agendamento (proteção com autenticação e autorização)
 router.put(
   "/appointment/update",
   userMiddleware.handleAuth.bind(userMiddleware),
@@ -31,6 +34,7 @@ router.put(
   updateAppointmentController.handle.bind(updateAppointmentController) as RequestHandler
 );
 
+// Rota para deletar o agendamento (proteção com autenticação e autorização)
 router.delete(
   "/appointment/delete/:id",
   userMiddleware.handleAuth.bind(userMiddleware),
@@ -39,6 +43,7 @@ router.delete(
   deleteAppointmentController.handle.bind(deleteAppointmentController) as RequestHandler
 );
 
+// Rota para listar todos os agendamentos (sem proteção)
 router.get(
   "/appointment/all",
   getAllAppointmentsController.handle.bind(getAllAppointmentsController) as RequestHandler
