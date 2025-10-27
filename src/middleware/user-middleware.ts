@@ -26,11 +26,7 @@ export class UserMiddleware {
   // Validação de criação de usuário
   async handleCreateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { name, email, password } = req.body;
-    const missingFields: string[] = [];
-
-    if (!name) missingFields.push("name");
-    if (!email) missingFields.push("email");
-    if (!password) missingFields.push("password");
+    const missingFields = ["name", "email", "password"].filter(field => !req.body[field]);
 
     if (missingFields.length > 0) {
       res.status(400).json({
@@ -40,16 +36,14 @@ export class UserMiddleware {
         data: null,
       });
     } else {
-      next(); 
+      next(); // Prossegue para o próximo middleware
     }
   }
 
+  // Validação de login
   async handleLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { email, password } = req.body;
-    const missingFields: string[] = [];
-
-    if (!email) missingFields.push("email");
-    if (!password) missingFields.push("password");
+    const missingFields = ["email", "password"].filter(field => !req.body[field]);
 
     if (missingFields.length > 0) {
       res.status(400).json({
@@ -59,7 +53,7 @@ export class UserMiddleware {
         data: null,
       });
     } else {
-      next(); // Se os dados estiverem ok, passa para o próximo middleware
+      next(); // Passa para o próximo middleware
     }
   }
 
@@ -75,12 +69,11 @@ export class UserMiddleware {
           message: "Token não fornecido",
           data: null,
         });
-        return;  // Interrompe o fluxo se o token não for fornecido
+        return; // Interrompe o fluxo após o envio da resposta
       }
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
 
-      // Verificação de token adicional
       if (!decoded || !decoded.id || !decoded.role) {
         res.status(401).json({
           status: false,
@@ -88,13 +81,13 @@ export class UserMiddleware {
           message: "Token inválido ou incompleto",
           data: null,
         });
-        return;  // Interrompe o fluxo se o token for inválido ou incompleto
+        return; // Interrompe o fluxo após o envio da resposta
       }
 
       req.user = decoded; // Armazena as informações do usuário no request
       next(); // Prossegue para o próximo middleware
     } catch (err) {
-      console.error("JWT inválido:", err);
+      console.error("Erro ao verificar o token:", err);
       res.status(401).json({
         status: false,
         code: 401,
@@ -111,11 +104,15 @@ export class UserMiddleware {
 
       if (!user) {
         res.status(401).json({ message: "Token não fornecido." });
-      } else if (!roles.includes(user.role.toUpperCase() as UserRole)) {
-        res.status(403).json({ message: "Acesso negado." });
-      } else {
-        next(); // Prossegue se o role estiver correto
+        return; // Interrompe o fluxo após o envio da resposta
       }
+
+      if (!roles.includes(user.role.toUpperCase() as UserRole)) {
+        res.status(403).json({ message: "Acesso negado." });
+        return; // Interrompe o fluxo após o envio da resposta
+      }
+
+      next(); // Prossegue se o role estiver correto
     };
   }
 
@@ -123,8 +120,8 @@ export class UserMiddleware {
   async handleLogout(req: Request, res: Response, next: NextFunction): Promise<void> {
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production", // Em produção, usa HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Controla o comportamento do cookie
       path: "/",
     });
 
