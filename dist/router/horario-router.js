@@ -1,0 +1,28 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const horario_middleware_1 = require("../middleware/horario-middleware");
+const create_horario_controller_1 = require("../controller/horarios/create-horario-controller");
+const get_all_horarios_controller_1 = require("../controller/horarios/get-all-horarios-controller");
+const delete_horario_controller_1 = require("../controller/horarios/delete-horario-controller");
+const update_horario_controller_1 = require("../controller/horarios/update-horario-controller");
+const get_by_barbeiros_controller_1 = require("../controller/horarios/get-by-barbeiros-controller");
+const user_middleware_1 = require("../middleware/user-middleware");
+const router = express_1.default.Router();
+const createHorarioController = new create_horario_controller_1.CreateHorarioController();
+const updateHorarioController = new update_horario_controller_1.UpdateHorarioController();
+const deleteHorarioController = new delete_horario_controller_1.DeleteHorarioController();
+const getAllHorariosController = new get_all_horarios_controller_1.GetAllHorariosController();
+const getHorariosByBarbeiroController = new get_by_barbeiros_controller_1.GetHorariosByBarbeiroController();
+const horarioMiddleware = new horario_middleware_1.HorarioMiddleware();
+const userMiddleware = new user_middleware_1.UserMiddleware();
+const allowedRoles = ["ADMIN", "BARBEIRO"];
+router.post("/horario/create", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), horarioMiddleware.handleCreateHorario.bind(horarioMiddleware), createHorarioController.handle.bind(createHorarioController));
+router.put("/horario/update/:id", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), horarioMiddleware.handleUpdateHorario.bind(horarioMiddleware), updateHorarioController.handle.bind(updateHorarioController));
+router.delete("/horario/delete/:id", userMiddleware.handleAuth.bind(userMiddleware), userMiddleware.authorizeRoles(...allowedRoles), horarioMiddleware.handleDeleteHorario.bind(horarioMiddleware), deleteHorarioController.handle.bind(deleteHorarioController));
+router.get("/horario/getall", getAllHorariosController.handle.bind(getAllHorariosController));
+router.get("/horario/barbeiro/:barbeiro", getHorariosByBarbeiroController.handle.bind(getHorariosByBarbeiroController));
+exports.default = router;
