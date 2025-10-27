@@ -23,15 +23,22 @@ server.use(cookieParser());
 // 🧩 CORS configurado
 // =========================
 const allowedOrigins = [
-  "https://www.kingsbarber.com.br",
-  "https://kingsbarber.com.br",
-  "http://localhost:3000",
+  "https://www.kingsbarber.com.br",  // Prod frontend
+  "https://kingsbarber.com.br",      // Prod backend ou outro domínio
+  "http://localhost:3000",            // Localhost para dev
 ];
 
 server.use(
   cors({
-    origin: allowedOrigins,
-    credentials: true,
+    origin: (origin, callback) => {
+      // Se não houver origem (para requisições internas do servidor), permite a requisição
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Não autorizado pela política de CORS"));
+      }
+    },
+    credentials: true,  // Para enviar cookies com as requisições
   })
 );
 
