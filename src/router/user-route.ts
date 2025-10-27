@@ -21,7 +21,6 @@ router.post(
 router.post(
   "/auth/login",
   userMiddleware.loginLimiter, 
-  userMiddleware.handleLogin.bind(userMiddleware) as RequestHandler,
   loginUserController.handle.bind(loginUserController) as RequestHandler
 );
 
