@@ -11,19 +11,15 @@ const createAppointmentController = new CreateAppointmentController();
 const updateAppointmentController = new UpdateAppointmentController();
 const deleteAppointmentController = new DeleteAppointmentController();
 const getAllAppointmentsController = new GetAllAppointmentsController();
-
 const appointmentMiddleware = new AppointmentMiddleware();
 const userMiddleware = new UserMiddleware();
 
-// Roteador
 const router = express.Router();
 
 const allowedRoles: UserRole[] = ["ADMIN", "BARBEIRO"];
 
 router.post(
   "/appointment/create",
-  appointmentMiddleware.handleCreateAppointment.bind(appointmentMiddleware) as RequestHandler,
-  
   createAppointmentController.handle.bind(createAppointmentController) as RequestHandler
 );
 
@@ -45,8 +41,6 @@ router.delete(
 
 router.get(
   "/appointment/all",
-  userMiddleware.handleAuth.bind(userMiddleware),
-  userMiddleware.authorizeRoles(...allowedRoles),
   getAllAppointmentsController.handle.bind(getAllAppointmentsController) as RequestHandler
 );
 
