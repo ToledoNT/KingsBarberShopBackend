@@ -135,4 +135,24 @@ async deleteById(id: string): Promise<ResponseTemplateInterface> {
       return new ResponseTemplateModel(false, 500, "Erro interno ao recuperar profissionais", []);
     }
   }
+  async getById(id: string): Promise<ResponseTemplateInterface> {
+    try {
+      const professional = await prisma.profissional.findUnique({
+        where: { id },
+        include: {
+          procedimentos: true, 
+          horariosDisponiveis: true, 
+        },
+      });
+
+      if (!professional) {
+        return new ResponseTemplateModel(false, 404, "Profissional não encontrado", []);
+      }
+
+      return new ResponseTemplateModel(true, 200, "Profissional encontrado com sucesso", professional);
+    } catch (error: any) {
+      console.error("Erro ao buscar profissional por ID:", error);
+      return new ResponseTemplateModel(false, 500, "Erro interno ao buscar profissional", []);
+    }
+  }
 }

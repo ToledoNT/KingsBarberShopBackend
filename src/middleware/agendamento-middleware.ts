@@ -1,24 +1,37 @@
 import type { Request, Response, NextFunction } from "express";
 
 export class AppointmentMiddleware {
-  handleCreateAppointment(req: Request, res: Response, next: NextFunction): void {
-    const { nome, telefone, email, data, hora, servico, barbeiro } = req.body;
+handleCreateAppointment(req: Request, res: Response, next: NextFunction): void {
+    const { nome, telefone, email, barbeiro, data, hora, servico, status, inicio , fim  } = req.body;
 
-    if (!nome || !telefone || !email || !data || !hora || !servico || !barbeiro) {
+    if (
+      !nome ||
+      !telefone ||
+      !email ||
+      !data ||
+      !hora ||
+      !servico ||
+      !barbeiro ||
+      !inicio ||
+      !fim ||
+
+      !status
+    ) {
       res.status(400).json({
         status: false,
         code: 400,
-        message: "Todos os campos são obrigatórios.",
+        message: "Todos os campos obrigatórios devem ser preenchidos.",
         data: [],
       });
       return;
     }
 
+    // Chama o próximo middleware ou controller
     next();
   }
 
   handleUpdateAppointment(req: Request, res: Response, next: NextFunction): void {
-    const { id, nome, telefone, email, data, hora, servico, barbeiro, status } = req.body;
+    const { id, nome, telefone, email, data, inicio, fim, servicoId, profissionalId, status } = req.body;
 
     if (!id) {
       res.status(400).json({
@@ -30,7 +43,7 @@ export class AppointmentMiddleware {
       return;
     }
 
-    if (!nome && !telefone && !email && !data && !hora && !servico && !barbeiro && !status) {
+    if (!nome && !telefone && !email && !data && !inicio && !fim && !servicoId && !profissionalId && !status) {
       res.status(400).json({
         status: false,
         code: 400,
