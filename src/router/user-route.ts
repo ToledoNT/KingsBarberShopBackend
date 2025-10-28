@@ -12,11 +12,11 @@ const userMiddleware = new UserMiddleware();
 
 const router = express.Router();
 
-router.post(
-  "/auth/register",
-  userMiddleware.handleCreateUser.bind(userMiddleware) as RequestHandler,
-  createUserController.handle.bind(createUserController) as RequestHandler
-);
+// router.post(
+//   "/auth/register",
+//   userMiddleware.handleCreateUser.bind(userMiddleware) as RequestHandler,
+//   createUserController.handle.bind(createUserController) as RequestHandler
+// );
 
 router.post(
   "/auth/login",
