@@ -7,7 +7,6 @@ import { ResponseTemplateModel } from "../../../model/response-templete-model";
 export class PrismaAppointmentRepository {
   async create(data: ICreateAppointment): Promise<ResponseTemplateInterface> {
     try {
-      // Busca dados do serviço e profissional (snapshot)
       const servico = await prisma.procedimento.findUnique({
         where: { id: data.servico },
       });
@@ -24,7 +23,7 @@ export class PrismaAppointmentRepository {
         data: {
           nome: data.nome,
           telefone: data.telefone,
-          email: data.email,
+          email: data.email?.trim() || "sem email",
           data: new Date(data.data),
           inicio: data.inicio, 
           fim: data.fim,       
@@ -126,6 +125,6 @@ export class PrismaAppointmentRepository {
   } catch (error: any) {
     console.error("Erro ao buscar agendamento por ID:", error);
     return new ResponseTemplateModel(false, 500, "Erro interno ao buscar agendamento", []);
+   }
   }
-}
 }

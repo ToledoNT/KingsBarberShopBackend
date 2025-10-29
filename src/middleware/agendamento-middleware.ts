@@ -7,7 +7,6 @@ handleCreateAppointment(req: Request, res: Response, next: NextFunction): void {
     if (
       !nome ||
       !telefone ||
-      !email ||
       !data ||
       !hora ||
       !servico ||
@@ -26,7 +25,6 @@ handleCreateAppointment(req: Request, res: Response, next: NextFunction): void {
       return;
     }
 
-    // Chama o próximo middleware ou controller
     next();
   }
 

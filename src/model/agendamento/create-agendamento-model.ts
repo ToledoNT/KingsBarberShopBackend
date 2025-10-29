@@ -4,7 +4,7 @@ export class AgendamentoModel {
   id?: string;
   nome: string;
   telefone: string;
-  email: string;
+  email?: string;
   data: Date;
   hora: string;
   inicio: string;
@@ -22,26 +22,21 @@ export class AgendamentoModel {
     this.id = data.id;
     this.nome = data.nome;
     this.telefone = data.telefone;
-    this.email = data.email;
+    this.email = data.email && data.email.trim() !== "" ? data.email : "sem email";
 
-    // Normaliza data
     this.data = data.data ? new Date(data.data) : new Date();
 
-    // Normaliza hora, inicio e fim
     this.hora = data.hora ?? "";
     this.inicio = data.inicio ?? "";
     this.fim = data.fim ?? "";
 
-    // Normaliza serviço
     this.servicoId = data.servicoId ?? data.servico ?? "";
     this.servicoNome = data.servico?.nome ?? data.servicoNome;
     this.servicoValor = data.servico?.valor ?? data.servicoValor;
 
-    // Normaliza profissional
     this.profissionalId = data.profissionalId ?? data.barbeiro ?? "";
     this.profissionalNome = data.profissional?.nome ?? data.profissionalNome;
 
-    // Normaliza status
     this.status = data.status ? (data.status as StatusAgendamento) : StatusAgendamento.AGENDADO;
 
     this.criadoEm = data.criadoEm ?? new Date();

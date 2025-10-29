@@ -25,7 +25,6 @@ export class CreateAppointmentController {
       if (
         !data.nome ||
         !data.telefone ||
-        !data.email ||
         !data.data ||
         !data.hora ||
         !data.servico ||
@@ -44,32 +43,28 @@ export class CreateAppointmentController {
       }
 
       const horarioResponse = await new GetHorarioByIdUseCase().execute(data.hora);
-      
       if (!horarioResponse?.status || !horarioResponse.data) {
         res.status(404).json({ message: "Horário não encontrado." });
         return;
       }
 
-      const horario = horarioResponse.data.data; 
+      const horario = horarioResponse.data.data;
 
       const normalizarData = (dataString: string): string => {
         try {
-          if (/^\d{4}-\d{2}-\d{2}$/.test(dataString)) {
+          if (/^\d{4}-\d{2}-\d{2}$/.test(dataString)) 
             return dataString;
-          }
-          
-          const data = new Date(dataString);
-          if (isNaN(data.getTime())) {
-            throw new Error('Data inválida');
-          }
-          
-          const ano = data.getFullYear();
-          const mes = String(data.getMonth() + 1).padStart(2, '0');
-          const dia = String(data.getDate()).padStart(2, '0');
-          
+
+          const dataObj = new Date(dataString);
+          if (isNaN(dataObj.getTime())) 
+            throw new Error("Data inválida");
+          const ano = dataObj.getFullYear();
+          const mes = String(dataObj.getMonth() + 1).padStart(2, "0");
+          const dia = String(dataObj.getDate()).padStart(2, "0");
+
           return `${ano}-${mes}-${dia}`;
         } catch (error) {
-          console.error('Erro ao normalizar data:', dataString, error);
+          console.error("Erro ao normalizar data:", dataString, error);
           throw new Error(`Data inválida: ${dataString}`);
         }
       };
@@ -78,13 +73,12 @@ export class CreateAppointmentController {
       const dataAgendamentoNormalizada = normalizarData(data.data);
 
       const mesmaData = horarioDataNormalizada === dataAgendamentoNormalizada;
-
       const mesmoInicio = horario.inicio === data.inicio;
       const mesmoFim = horario.fim === data.fim;
       const mesmoProfissional = horario.profissionalId === data.profissional;
 
       if (!mesmaData || !mesmoInicio || !mesmoFim || !mesmoProfissional) {
-        res.status(409).json({ 
+        res.status(409).json({
           message: "O horário não corresponde ao registrado. Verifique os dados.",
           details: {
             mesmaData,
@@ -111,17 +105,20 @@ export class CreateAppointmentController {
 
       const updateRelatorioUseCase = new UpdateRelatorioUseCase();
       await updateRelatorioUseCase.execute({
-        mesAno: new Date(new Date(dataAgendamentoNormalizada).getFullYear(), new Date(dataAgendamentoNormalizada).getMonth(), 1),
+        mesAno: new Date(
+          new Date(dataAgendamentoNormalizada).getFullYear(),
+          new Date(dataAgendamentoNormalizada).getMonth(),
+          1
+        ),
         agendamentos: 1,
       });
 
       res.status(201).json(appointmentResult);
-      
     } catch (error) {
       console.error("Erro no CreateAppointmentController:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         message: "Erro interno do servidor.",
-        error: error instanceof Error ? error.message : "Erro desconhecido"
+        error: error instanceof Error ? error.message : "Erro desconhecido",
       });
     }
   }

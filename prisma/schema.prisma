@@ -47,10 +47,10 @@ model Agendamento {
   id               String        @id @default(auto()) @map("_id") @db.ObjectId
   nome             String
   telefone         String
-  email            String
+  email            String?       
   data             DateTime
-  inicio           String?       // ✅ adiciona aqui
-  fim              String?       // ✅ adiciona aqui
+  inicio           String?       
+  fim              String?      
   servicoId        String        @db.ObjectId
   servico          Procedimento  @relation(fields: [servicoId], references: [id])
   profissionalId   String        @db.ObjectId
@@ -62,6 +62,7 @@ model Agendamento {
   criadoEm         DateTime      @default(now())
   atualizadoEm     DateTime      @updatedAt
 }
+
 model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   name         String

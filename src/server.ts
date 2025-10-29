@@ -57,7 +57,6 @@ server.use("/api", FinanceRoute);
 server.use("/api", RelatorioRoute);
 server.use("/api", StatusRoute);
 
-// Rota raiz de teste para verificar se o servidor está funcionando
 server.get("/", (req: Request, res: Response) => {
   res.send("🔥 Servidor rodando e rotas carregadas!");
 });
@@ -75,5 +74,4 @@ server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-// Exportando o servidor para ser utilizado em outros arquivos (ex: index.ts)
 export default server;

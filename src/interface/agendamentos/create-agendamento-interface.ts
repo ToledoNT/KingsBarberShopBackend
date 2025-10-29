@@ -9,7 +9,7 @@ export enum StatusAgendamento {
 export interface ICreateAppointment {
   nome: string;
   telefone: string;
-  email: string;
+  email?: string;
   data: string;
   hora?: string;           
   servico: string;
