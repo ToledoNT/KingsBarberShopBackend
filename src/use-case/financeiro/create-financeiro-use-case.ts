@@ -4,8 +4,6 @@ import { CreateLog } from "../logs/create-log";
 
 export class CreateFinanceiroUseCase {
   async execute(data: ICreateFinanceiro) {
-    console.log("Criando lançamento financeiro...");
-
     const repository = new PrismaFinanceiroRepository();
     const response = await repository.create(data);
 

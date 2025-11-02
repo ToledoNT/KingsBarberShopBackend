@@ -4,6 +4,8 @@ export enum StatusAgendamento {
   CONCLUIDO = "Concluído",
   CANCELADO = "Cancelado",
   NAO_COMPARECEU = "Não Compareceu",
+  PENDENTE = "Pendente",
+  PAGO = "Pago"
 }
 
 export interface ICreateAppointment {

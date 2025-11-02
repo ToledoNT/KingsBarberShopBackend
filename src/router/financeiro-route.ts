@@ -1,5 +1,5 @@
 import express from "express";
-import { GetAllFinanceiroController } from "../controller/financeiro/get-all-financiero";
+import { GetAllFinanceiroController } from "../controller/financeiro/get-all-financeiro";
 import { UserMiddleware } from "../middleware/user-middleware";
 
 const router = express.Router();

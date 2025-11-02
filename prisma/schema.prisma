@@ -63,6 +63,16 @@ model Agendamento {
   atualizadoEm     DateTime      @updatedAt
 }
 
+model Financeiro {
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  agendamentoId    String       @unique @db.ObjectId
+  clienteNome      String
+  valor            Float
+  status           String       @default("Pago") 
+  criadoEm         DateTime     @default(now())
+  atualizadoEm     DateTime     @updatedAt
+}
+
 model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   name         String
@@ -75,16 +85,6 @@ model User {
 enum Role {
   ADMIN
   BARBEIRO
-}
-
-model Financeiro {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  agendamentoId    String   @db.ObjectId
-  clienteNome      String
-  valor            Float
-  status           String   @default("Pago") 
-  criadoEm         DateTime @default(now())
-  atualizadoEm     DateTime @updatedAt
 }
 
 model Relatorio {

@@ -68,7 +68,7 @@ export class UpdateAppointmentController {
           agendamentoId: agendamento.id,
           clienteNome,
           valor,
-          status: "Pago",
+          status: StatusAgendamento.PAGO,
         });
 
         await new UpdateRelatorioUseCase().execute({
@@ -128,11 +128,14 @@ export class UpdateAppointmentController {
       }
     }
 
+    if (status === StatusAgendamento.PENDENTE) {
+    const updatedAppointment = await new UpdateAppointmentUseCase().execute({ id, status });
     res.status(200).json({
       status: true,
       code: 200,
       message: "Agendamento atualizado com sucesso",
       data: updatedAppointment,
     });
+    }
   }
 }

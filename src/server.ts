@@ -21,16 +21,15 @@ server.use(cookieParser());
 // Função para configuração de CORS
 // =========================
 const configureCORS = () => {
-  const allowedOrigins = [
+const allowedOrigins = [
     "https://www.kingsbarber.com.br",  
-    "https://kingsbarber.com.br",      
-    "http://localhost:3000",           
-  ];
+    "https://kingsbarber.com.br"    
+];
 
   return cors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);  // Permite a requisição
+        callback(null, true);  
       } else {
         console.log(`CORS bloqueado para origem: ${origin}`); 
         callback(new Error("Não autorizado pela política de CORS"));  

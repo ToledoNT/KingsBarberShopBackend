@@ -1,9 +1,11 @@
+import { StatusAgendamento } from "../../interface/agendamentos/create-agendamento-interface";
+
 export class FinanceiroModel {
   id?: string;
   agendamentoId: string;
   clienteNome: string;
   valor: number;
-  status: "Pago" | "Pendente"; 
+  status: StatusAgendamento; 
   criadoEm: Date;
   atualizadoEm: Date;
   agendamentoNome?: string;
@@ -14,7 +16,7 @@ export class FinanceiroModel {
     this.agendamentoId = data.agendamentoId ?? "";
     this.clienteNome = data.clienteNome ?? "";       
     this.valor = data.valor ?? 0;
-    this.status = data.status ?? "Pago";            
+    this.status = data.status ?? StatusAgendamento.AGENDADO;      
 
     this.agendamentoNome = data.agendamento?.nome ?? data.agendamentoNome;
     this.profissionalNome = data.profissional?.nome ?? data.profissionalNome;
