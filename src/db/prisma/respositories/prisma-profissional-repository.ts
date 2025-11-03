@@ -135,6 +135,7 @@ async deleteById(id: string): Promise<ResponseTemplateInterface> {
       return new ResponseTemplateModel(false, 500, "Erro interno ao recuperar profissionais", []);
     }
   }
+  
   async getById(id: string): Promise<ResponseTemplateInterface> {
     try {
       const professional = await prisma.profissional.findUnique({

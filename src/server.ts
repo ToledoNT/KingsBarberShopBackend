@@ -23,7 +23,8 @@ server.use(cookieParser());
 const configureCORS = () => {
 const allowedOrigins = [
     "https://www.kingsbarber.com.br",  
-    "https://kingsbarber.com.br"    
+    "https://kingsbarber.com.br",
+    "http://localhost:3000"    
 ];
 
   return cors({
