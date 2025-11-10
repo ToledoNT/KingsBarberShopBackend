@@ -1,30 +1,19 @@
 import dotenv from "dotenv";
-import fs from "fs";
-import https from "https";
 import server from "./server";
 
 dotenv.config();
 
+// Middleware de log para depuração
+server.use((req, res, next) => {
+  console.log(`🚀 Request recebida: ${req.method} ${req.originalUrl}`);
+  console.log("Headers recebidos:", req.headers);
+  next();
+});
+
 const PORT = Number(process.env.PORT) || 4001;
 
-// Caminhos dos certificados
-const keyPath = "./cert/server.key";
-const certPath = "./cert/server.cert";
-
-// Validação
-if (!fs.existsSync(keyPath) || !fs.existsSync(certPath)) {
-  console.error("❌ Arquivos SSL não encontrados!");
-  console.error(`Chave: ${keyPath}\nCertificado: ${certPath}`);
-  process.exit(1);
-}
-
-const options = {
-  key: fs.readFileSync(keyPath),
-  cert: fs.readFileSync(certPath),
-};
-
-// Cria servidor HTTPS
-https.createServer(options, server).listen(PORT, "0.0.0.0", () => {
+// escuta em todas as interfaces
+server.listen(PORT, "0.0.0.0", () => {
   console.clear();
-  console.log(`✅ Servidor HTTPS rodando em: https://192.168.18.129:${PORT}`);
+  console.log(`🔥 Servidor rodando na porta ${PORT}`);
 });
