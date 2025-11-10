@@ -10,6 +10,11 @@ export interface IFinance {
 }
 
 export interface IRelatorio {
+  mesAno: string; 
+  agendamentos?: number;
+  faturamento?: number;
   cancelados?: number;
   naoCompareceu?: number;
+  criadoEm: string; 
+  atualizadoEm?: string; 
 }

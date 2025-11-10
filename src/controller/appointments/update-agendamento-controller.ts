@@ -33,7 +33,7 @@ export class UpdateAppointmentController {
       return;
     }
 
-    const agendamento = appointmentResponse.data.data;
+    const agendamento = appointmentResponse.data;
 
     const statusProtegidos = [
       StatusAgendamento.CONCLUIDO,
@@ -57,13 +57,17 @@ export class UpdateAppointmentController {
       return;
     }
 
-    const updatedAppointment = await new UpdateAppointmentUseCase().execute({ id, status });
+    let updatedAppointment;
 
-    if (status === StatusAgendamento.CONCLUIDO && agendamento.status !== StatusAgendamento.CONCLUIDO) {
-      const clienteNome = agendamento.nome ?? "Cliente não informado";
-      const valor = agendamento.servicoPreco ?? agendamento.servico?.valor ?? 0;
+    try {
+      // Atualiza o agendamento no banco
+      updatedAppointment = await new UpdateAppointmentUseCase().execute({ id, status });
 
-      try {
+      // Lógica extra por status
+      if (status === StatusAgendamento.CONCLUIDO && agendamento.status !== StatusAgendamento.CONCLUIDO) {
+        const clienteNome = agendamento.nome ?? "Cliente não informado";
+        const valor = agendamento.servicoPreco ?? agendamento.servico?.valor ?? 0;
+
         await new CreateFinanceiroUseCase().execute({
           agendamentoId: agendamento.id,
           clienteNome,
@@ -75,14 +79,9 @@ export class UpdateAppointmentController {
           mesAno: new Date(agendamento.criadoEm.getFullYear(), agendamento.criadoEm.getMonth(), 1),
           faturamento: valor,
         });
-
-      } catch (err) {
-        console.error("Erro ao processar financeiro/relatório:", err);
       }
-    }
 
-    if (status === StatusAgendamento.CANCELADO && agendamento.status !== StatusAgendamento.CANCELADO) {
-      try {
+      if (status === StatusAgendamento.CANCELADO && agendamento.status !== StatusAgendamento.CANCELADO) {
         const horarioParaCriar: ICreateHorario = {
           profissionalId: agendamento.profissionalId,
           data: agendamento.data,
@@ -92,50 +91,38 @@ export class UpdateAppointmentController {
         };
 
         await new CreateHorarioUseCase().execute(horarioParaCriar);
-        console.log(`[Horário] Horário criado após cancelamento.`);
 
-        const mesAno = new Date(
-          agendamento.criadoEm.getFullYear(),
-          agendamento.criadoEm.getMonth(),
-          1
-        );
-
+        const mesAno = new Date(agendamento.criadoEm.getFullYear(), agendamento.criadoEm.getMonth(), 1);
         await new UpdateRelatorioUseCase().execute({
           mesAno,
           cancelados: 1,
         });
-
-      } catch (err) {
-        console.error("Erro ao criar horário/atualizar relatório após cancelamento:", err);
       }
-    }
 
-    if (status === StatusAgendamento.NAO_COMPARECEU && agendamento.status !== StatusAgendamento.NAO_COMPARECEU) {
-      try {
-        const mesAno = new Date(
-          agendamento.criadoEm.getFullYear(),
-          agendamento.criadoEm.getMonth(),
-          1
-        );
-
+      if (status === StatusAgendamento.NAO_COMPARECEU && agendamento.status !== StatusAgendamento.NAO_COMPARECEU) {
+        const mesAno = new Date(agendamento.criadoEm.getFullYear(), agendamento.criadoEm.getMonth(), 1);
         await new UpdateRelatorioUseCase().execute({
           mesAno,
           naoCompareceu: 1,
         });
-
-      } catch (err) {
-        console.error("Erro ao atualizar relatório após não comparecimento:", err);
       }
+
+    } catch (err) {
+      console.error("Erro ao atualizar agendamento ou processar lógica extra:", err);
+      res.status(500).json({
+        status: false,
+        code: 500,
+        message: "Erro ao atualizar agendamento",
+        data: [],
+      });
+      return;
     }
 
-    if (status === StatusAgendamento.PENDENTE) {
-    const updatedAppointment = await new UpdateAppointmentUseCase().execute({ id, status });
     res.status(200).json({
       status: true,
       code: 200,
       message: "Agendamento atualizado com sucesso",
       data: updatedAppointment,
     });
-    }
   }
 }

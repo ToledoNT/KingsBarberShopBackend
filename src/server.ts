@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import cookieParser from "cookie-parser";
+
 import UserRoute from "./router/user-route";
 import ProfissionalRoute from "./router/profissional-route";
 import AgendamentoRoute from "./router/agendamentos-admin-route";
@@ -13,40 +14,39 @@ import StatusRoute from "./router/status-route";
 const server = express();
 
 server.set("trust proxy", 1);
-
 server.use(express.json());
 server.use(cookieParser());
 
 // =========================
-// Função para configuração de CORS
+// ✅ Configuração do CORS
 // =========================
-const configureCORS = () => {
 const allowedOrigins = [
-    "https://www.kingsbarber.com.br",  
-    "https://kingsbarber.com.br",
-    "http://localhost:3000"    
+  "https://192.168.18.129:3000", // Next HTTPS local
+  "http://192.168.18.129:3000",  // Next HTTP local (se ainda não rodar https)
+  "https://localhost:3000",
+  "http://localhost:3000",
+  "https://www.kingsbarber.com.br",
+  "https://kingsbarber.com.br"
 ];
 
-  return cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);  
-      } else {
-        console.log(`CORS bloqueado para origem: ${origin}`); 
-        callback(new Error("Não autorizado pela política de CORS"));  
-      }
-    },
-    credentials: true,  
-  });
+
+const corsOptions: CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // Permite requisições sem 'origin' (ex: Postman)
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log(`🚫 CORS bloqueado para origem: ${origin}`);
+      callback(new Error("Não autorizado pela política de CORS"));
+    }
+  },
+  credentials: true,
 };
 
-// =========================
-// Configuração do CORS
-// =========================
-server.use(configureCORS());
+server.use(cors(corsOptions));
 
 // =========================
-// Configuração das Rotas
+// ✅ Rotas da aplicação
 // =========================
 server.use("/api", UserRoute);
 server.use("/api", ProfissionalRoute);
@@ -58,19 +58,18 @@ server.use("/api", RelatorioRoute);
 server.use("/api", StatusRoute);
 
 server.get("/", (req: Request, res: Response) => {
-  res.send("🔥 Servidor rodando e rotas carregadas!");
+  res.send("🔥 Servidor rodando e rotas carregadas com sucesso!");
 });
 
 // =========================
-// Middleware de Erros (Handler Global)
+// ✅ Middleware Global de Erros
 // =========================
 server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("Erro inesperado:", err);  // Log do erro
+  console.error("Erro inesperado:", err.message);
   res.status(500).json({
     status: false,
     code: 500,
     message: "Erro interno do servidor. Tente novamente mais tarde.",
-    data: null,
   });
 });
 

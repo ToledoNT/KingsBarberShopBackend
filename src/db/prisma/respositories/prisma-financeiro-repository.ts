@@ -6,35 +6,42 @@ import { ResponseTemplateInterface } from "../../../interface/response-template-
 const prisma = new PrismaClient();
 
 export class PrismaFinanceiroRepository {
-  async create(financeiro: ICreateFinanceiro): Promise<ResponseTemplateInterface> {
-    try {
-      const created = await prisma.financeiro.create({
-        data: {
-          agendamentoId: financeiro.agendamentoId,
-          clienteNome: financeiro.clienteNome,
-          valor: financeiro.valor,
-          status: financeiro.status ?? "Pago",
-          criadoEm: financeiro.criadoEm ?? new Date(),
-          atualizadoEm: financeiro.atualizadoEm ?? new Date(),
-        },
-      });
-
-      return {
-        status: true,
-        code: 201,
-        message: "Lançamento financeiro criado com sucesso.",
-        data: created,
-      };
-    } catch (err: any) {
-      return {
-        status: false,
-        code: 500,
-        message: "Erro ao criar lançamento financeiro.",
-        data: [],
-        error: err.message,
-      };
+async create(financeiro: ICreateFinanceiro): Promise<ResponseTemplateInterface> {
+  try {
+    // ✅ Verifica se o ID do agendamento foi informado
+    if (!financeiro.agendamentoId) {
+      throw new Error("O campo 'agendamentoId' é obrigatório para criar o lançamento financeiro.");
     }
+
+    const created = await prisma.financeiro.create({
+      data: {
+        agendamentoId: financeiro.agendamentoId,
+        clienteNome: financeiro.clienteNome ?? "Cliente não informado",
+        valor: financeiro.valor ?? 0,
+        status: financeiro.status ?? "Pago",
+        criadoEm: financeiro.criadoEm ?? new Date(),
+        atualizadoEm: financeiro.atualizadoEm ?? new Date(),
+      },
+    });
+
+    return {
+      status: true,
+      code: 201,
+      message: "Lançamento financeiro criado com sucesso.",
+      data: created,
+    };
+  } catch (err: any) {
+    return {
+      status: false,
+      code: 500,
+      message: err.message.includes("agendamentoId")
+        ? err.message // mostra a mensagem clara da validação
+        : "Erro ao criar lançamento financeiro.",
+      data: [],
+      error: err.message,
+    };
   }
+}
 
   async getAll(): Promise<ResponseTemplateInterface> {
     try {
