@@ -8,6 +8,7 @@ import ProcedimentoRoute from "./router/procedimentos-route";
 import HorarioRoute from "./router/horario-router";
 import FinanceRoute from "./router/financeiro-route";
 import RelatorioRoute from "./router/dashboard-route";
+import ProdutosRouter from "./router/produtos-router"
 import StatusRoute from "./router/status-route";
 
 const server = express();
@@ -55,6 +56,7 @@ server.use("/api", ProcedimentoRoute);
 server.use("/api", HorarioRoute);
 server.use("/api", FinanceRoute);
 server.use("/api", RelatorioRoute);
+server.use("/api", ProdutosRouter);
 server.use("/api", StatusRoute);
 
 // Rota raiz de teste para verificar se o servidor está funcionando

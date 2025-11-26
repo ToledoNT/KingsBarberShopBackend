@@ -99,6 +99,18 @@ model Relatorio {
   atualizadoEm  DateTime @updatedAt
 }
 
+model Produtos {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome        String
+  descricao   String?
+  preco       Float
+  quantidade  Int
+  categoria   String?
+  ativo       Boolean  @default(true)
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+}
+
 model Log {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   value     String
