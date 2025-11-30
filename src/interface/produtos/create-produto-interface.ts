@@ -2,7 +2,7 @@ export interface ICreateProduto {
   nome: string;
   descricao?: string;
   preco: number;
-  quantidade: number;
+  estoque: number;
   categoria?: string;
   ativo: boolean;
   criadoEm: string;   

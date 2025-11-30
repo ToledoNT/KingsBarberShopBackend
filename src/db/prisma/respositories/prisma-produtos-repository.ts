@@ -12,18 +12,15 @@ export class PrismaProdutoRepository {
           nome: data.nome,
           descricao: data.descricao || null,
           preco: data.preco,
-          quantidade: data.quantidade,
+          estoque: data.estoque, 
           categoria: data.categoria || null,
           ativo: data.ativo ?? true,
+          criadoEm: data.criadoEm,
+          atualizadoEm: data.atualizadoEm,
         },
       });
 
-      return new ResponseTemplateModel(
-        true,
-        201,
-        "Produto criado com sucesso",
-        produto
-      );
+      return new ResponseTemplateModel(true, 201, "Produto criado com sucesso", produto);
     } catch (error: any) {
       console.error("Erro ao criar produto:", error);
 
@@ -42,21 +39,17 @@ export class PrismaProdutoRepository {
       if (data.nome !== undefined) updateData.nome = data.nome;
       if (data.descricao !== undefined) updateData.descricao = data.descricao;
       if (data.preco !== undefined) updateData.preco = data.preco;
-      if (data.quantidade !== undefined) updateData.quantidade = data.quantidade;
+      if (data.estoque !== undefined) updateData.estoque = data.estoque; // << corrigido
       if (data.categoria !== undefined) updateData.categoria = data.categoria;
       if (data.ativo !== undefined) updateData.ativo = data.ativo;
+      updateData.atualizadoEm = new Date().toISOString(); // sempre atualiza
 
       const produtoAtualizado = await prisma.produtos.update({
         where: { id: data.id },
         data: updateData,
       });
 
-      return new ResponseTemplateModel(
-        true,
-        200,
-        "Produto atualizado com sucesso",
-        produtoAtualizado
-      );
+      return new ResponseTemplateModel(true, 200, "Produto atualizado com sucesso", produtoAtualizado);
     } catch (error: any) {
       console.error("Erro ao atualizar produto:", error);
 
@@ -74,9 +67,7 @@ export class PrismaProdutoRepository {
 
   async deleteById(id: string): Promise<ResponseTemplateInterface> {
     try {
-      const produto = await prisma.produtos.findUnique({
-        where: { id },
-      });
+      const produto = await prisma.produtos.findUnique({ where: { id } });
 
       if (!produto) {
         return new ResponseTemplateModel(false, 404, "Produto não encontrado", []);
@@ -88,7 +79,7 @@ export class PrismaProdutoRepository {
     } catch (error: any) {
       console.error("Erro ao deletar produto:", error);
 
-      if (error?.code === "P2025") {
+      if (error.code === "P2025") {
         return new ResponseTemplateModel(false, 404, "Produto não encontrado para exclusão", []);
       }
 
@@ -104,7 +95,7 @@ export class PrismaProdutoRepository {
           nome: true,
           descricao: true,
           preco: true,
-          quantidade: true,
+          estoque: true,
           categoria: true,
           ativo: true,
           criadoEm: true,
@@ -113,49 +104,25 @@ export class PrismaProdutoRepository {
         orderBy: { criadoEm: "desc" },
       });
 
-      return new ResponseTemplateModel(
-        true,
-        200,
-        "Produtos recuperados com sucesso",
-        produtos
-      );
+      return new ResponseTemplateModel(true, 200, "Produtos recuperados com sucesso", produtos);
     } catch (error: any) {
       console.error("Erro ao recuperar produtos:", error);
-
-      return new ResponseTemplateModel(
-        false,
-        500,
-        "Erro interno ao recuperar produtos",
-        []
-      );
+      return new ResponseTemplateModel(false, 500, "Erro interno ao recuperar produtos", []);
     }
   }
 
   async getById(id: string): Promise<ResponseTemplateInterface> {
     try {
-      const produto = await prisma.produtos.findUnique({
-        where: { id },
-      });
+      const produto = await prisma.produtos.findUnique({ where: { id } });
 
       if (!produto) {
         return new ResponseTemplateModel(false, 404, "Produto não encontrado", []);
       }
 
-      return new ResponseTemplateModel(
-        true,
-        200,
-        "Produto encontrado com sucesso",
-        produto
-      );
+      return new ResponseTemplateModel(true, 200, "Produto encontrado com sucesso", produto);
     } catch (error: any) {
       console.error("Erro ao buscar produto por ID:", error);
-
-      return new ResponseTemplateModel(
-        false,
-        500,
-        "Erro interno ao buscar produto",
-        []
-      );
+      return new ResponseTemplateModel(false, 500, "Erro interno ao buscar produto", []);
     }
   }
 }

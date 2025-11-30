@@ -1,11 +1,10 @@
-// interface/produtos/update-produto-interface.ts
 export interface IUpdateProduto {
   id: string;
-  nome: string;
+  nome?: string;
   descricao?: string;
-  preco: number;
-  quantidade: number;
+  preco?: number;
+  estoque?: number;
   categoria?: string;
-  ativo: boolean;
-  atualizadoEm: string;
+  ativo?: boolean;
+  atualizadoEm?: string;
 }

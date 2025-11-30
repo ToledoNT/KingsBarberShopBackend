@@ -22,13 +22,16 @@ server.use(cookieParser());
 // Função para configuração de CORS
 // =========================
 const configureCORS = () => {
-  const allowedOrigins = [
-    "https://www.kingsbarber.com.br",  
-    "https://kingsbarber.com.br",      
-    "http://localhost:3000",           
-  ];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://localhost:3000",
+  "http://192.168.18.129:3000",
+  "https://192.168.18.129:3000",
+  "https://www.kingsbarber.com.br",
+  "https://kingsbarber.com.br",
+];
 
-  return cors({
+return cors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);  // Permite a requisição

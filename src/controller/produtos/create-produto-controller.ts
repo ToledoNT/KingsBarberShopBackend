@@ -4,10 +4,12 @@ import { ICreateProduto } from "../../interface/produtos/create-produto-interfac
 
 export class CreateProdutoController {
   async handle(req: Request, res: Response): Promise<void> {
-    const { nome, descricao, preco, quantidade, categoria } = req.body;
+    const { nome, descricao, preco, estoque, categoria } = req.body;
+
+    console.log(req.body);
 
     // ============================
-    // Validação de campos obrigatórios
+    // Validações
     // ============================
     if (!nome) {
       res.status(400).json({
@@ -29,11 +31,11 @@ export class CreateProdutoController {
       return;
     }
 
-    if (quantidade == null || isNaN(Number(quantidade))) {
+    if (estoque == null || isNaN(Number(estoque))) {
       res.status(400).json({
         status: false,
         code: 400,
-        message: "O campo 'quantidade' é obrigatório e deve ser numérico.",
+        message: "O campo 'estoque' é obrigatório e deve ser numérico.",
         data: null,
       });
       return;
@@ -43,26 +45,36 @@ export class CreateProdutoController {
 
     try {
       const agora = new Date().toISOString();
+      const quantidade = Number(estoque);
 
-      const produto: ICreateProduto = {
-        nome,
-        descricao: descricao ?? "",
-        preco: Number(preco),
-        quantidade: Number(quantidade),
-        categoria: categoria ?? undefined,
-        ativo: true,
-        criadoEm: agora,
-        atualizadoEm: agora,
-      };
+      const produtosCriados = [];
 
-      const result = await useCase.execute(produto);
+      // ============================
+      // Criar vários produtos caso a quantidade seja maior que 1
+      // ============================
+      for (let i = 0; i < quantidade; i++) {
+        const produto: ICreateProduto = {
+          nome,
+          descricao: descricao ?? "",
+          preco: Number(preco),
+          estoque: 1, // cada produto é individual
+          categoria: categoria ?? undefined,
+          ativo: true,
+          criadoEm: agora,
+          atualizadoEm: agora,
+        };
 
-       res.status(201).json({
+        const novoProduto = await useCase.execute(produto);
+        produtosCriados.push(novoProduto);
+      }
+
+      res.status(201).json({
         status: true,
         code: 201,
-        message: "Produto criado com sucesso.",
-        data: result,
+        message: `Produto(s) criado(s) com sucesso: ${quantidade} unidade(s).`,
+        data: produtosCriados,
       });
+
     } catch (error: any) {
       console.error("Erro ao criar produto:", error);
 
