@@ -11,9 +11,6 @@ export class UpdateProdutoController {
     const { id } = req.params;
     const { nome, descricao, preco, estoque, categoria, status, usuarioPendente } = req.body;
 
-    // ============================
-    // Validações básicas
-    // ============================
     if (!id) {
       res.status(400).json({ status: false, code: 400, message: "O ID do produto é obrigatório.", data: null });
       return;
@@ -24,61 +21,123 @@ export class UpdateProdutoController {
       return;
     }
 
-    // ============================
-    // Valida status
-    // ============================
     const statusValido = status as "disponivel" | "vendido" | "consumido" | "pendente" | undefined;
-
     if (!statusValido) {
       res.status(400).json({ status: false, code: 400, message: "Status inválido.", data: null });
       return;
     }
 
-    // ============================
-    // Busca o produto atual
-    // ============================
+    // Buscar produto atual
     const getProdutoUseCase = new GetProdutoByIdUseCase();
     const produtoAtualResponse = await getProdutoUseCase.execute(id);
     const produtoAtual = produtoAtualResponse.data;
 
-    // Bloqueia alteração de status se já estiver vendido
+    if (!produtoAtual) {
+      res.status(404).json({ status: false, code: 404, message: "Produto não encontrado.", data: null });
+      return;
+    }
+
+    // Impede reverter status se já estiver vendido
     let statusParaAtualizar = statusValido;
-    if (produtoAtual?.status === "vendido" && statusValido !== "vendido") {
+    if (produtoAtual.status === "vendido") {
       statusParaAtualizar = "vendido";
     }
 
-    // ============================
-    // Lógica por STATUS
-    // ============================
-    if (statusParaAtualizar === "vendido" && produtoAtual?.status !== "vendido") {
+    // ============================================================
+    // STATUS → PENDENTE (somar +1)
+    // ============================================================
+    if (statusParaAtualizar === "pendente" && produtoAtual.status !== "pendente") {
       try {
-        const financeiroUseCase = new CreateFinanceiroUseCase();
-        const dataFinanceiro: ICreateFinanceiro = { clienteNome: nome, valor: Number(preco) || 0 };
-        const retornoFinanceiro = await financeiroUseCase.execute(dataFinanceiro);
+        const updateRelatorio = new UpdateRelatorioUseCase();
 
-        if (!retornoFinanceiro) {
-          res.status(500).json({ status: false, code: 500, message: "Erro ao criar lançamento financeiro.", data: null });
-          return;
-        }
-
-        const addRelatorio = new UpdateRelatorioUseCase();
-        const dataRelatorio = {
+        await updateRelatorio.execute({
           mesAno: new Date(),
-          vendidos: 1,
-          faturamento: Number(preco) || 0,
-        };
-        await addRelatorio.execute(dataRelatorio);
+          pendentes: 1,
+          vendidos: 0,
+          faturamento: 0,
+          consumidos: 0
+        });
 
-      } catch (error) {
-        console.error("Erro ao criar registro financeiro:", error);
-        res.status(500).json({ status: false, code: 500, message: "Erro interno ao criar registro financeiro.", data: null });
+      } catch (err) {
+        console.error("Erro ao processar pendência:", err);
+        res.status(500).json({
+          status: false,
+          code: 500,
+          message: "Erro ao processar status pendente.",
+          data: null
+        });
         return;
       }
     }
 
-    // ============================
-    // Atualização do produto
-    // ============================
+    // ============================================================
+    // STATUS → VENDIDO
+    // cria financeiro + relatório
+    // ============================================================
+    if (statusParaAtualizar === "vendido" && produtoAtual.status !== "vendido") {
+      try {
+        const financeiroUseCase = new CreateFinanceiroUseCase();
+
+        await financeiroUseCase.execute({
+          clienteNome: nome,
+          valor: Number(preco) || 0
+        });
+
+        const estavaPendente = produtoAtual.status === "pendente";
+
+        const updateRelatorio = new UpdateRelatorioUseCase();
+
+        await updateRelatorio.execute({
+          mesAno: new Date(),
+          vendidos: 1,
+          faturamento: Number(preco) || 0,
+          pendentes: estavaPendente ? -1 : 0,
+          consumidos: 0
+        });
+
+      } catch (err) {
+        console.error("Erro ao processar venda:", err);
+        res.status(500).json({
+          status: false,
+          code: 500,
+          message: "Erro interno ao processar venda.",
+          data: null
+        });
+        return;
+      }
+    }
+
+    // ============================================================
+    // NOVO: STATUS → CONSUMIDO
+    // adiciona ao relatório sem faturamento
+    // ============================================================
+    if (statusParaAtualizar === "consumido" && produtoAtual.status !== "consumido") {
+      try {
+        const estavaPendente = produtoAtual.status === "pendente";
+
+        const updateRelatorio = new UpdateRelatorioUseCase();
+
+        await updateRelatorio.execute({
+          mesAno: new Date(),
+          consumidos: 1,
+          vendidos: 0,
+          faturamento: 0,
+          pendentes: estavaPendente ? -1 : 0
+        });
+
+      } catch (err) {
+        console.error("Erro ao processar consumo:", err);
+        res.status(500).json({
+          status: false,
+          code: 500,
+          message: "Erro interno ao processar consumo.",
+          data: null
+        });
+        return;
+      }
+    }
+
+    // Atualizar produto
     const dataAtualizacao: IUpdateProduto = {
       id,
       nome,
@@ -92,12 +151,17 @@ export class UpdateProdutoController {
     };
 
     try {
-      const useCase = new UpdateProdutoUseCase();
-      const result = await useCase.execute(dataAtualizacao);
+      const updateUseCase = new UpdateProdutoUseCase();
+      const result = await updateUseCase.execute(dataAtualizacao);
       res.status(result.code).json(result);
-    } catch (error) {
-      console.error("Erro ao atualizar produto:", error);
-      res.status(500).json({ status: false, code: 500, message: "Erro interno ao atualizar produto.", data: null });
+    } catch (err) {
+      console.error("Erro ao atualizar produto:", err);
+      res.status(500).json({
+        status: false,
+        code: 500,
+        message: "Erro interno ao atualizar produto.",
+        data: null
+      });
     }
   }
 }
