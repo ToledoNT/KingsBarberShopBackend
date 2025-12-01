@@ -8,14 +8,9 @@ const prisma = new PrismaClient();
 export class PrismaFinanceiroRepository {
 async create(financeiro: ICreateFinanceiro): Promise<ResponseTemplateInterface> {
   try {
-    // ✅ Verifica se o ID do agendamento foi informado
-    if (!financeiro.agendamentoId) {
-      throw new Error("O campo 'agendamentoId' é obrigatório para criar o lançamento financeiro.");
-    }
-
     const created = await prisma.financeiro.create({
       data: {
-        agendamentoId: financeiro.agendamentoId,
+        agendamentoId: financeiro.agendamentoId ?? undefined, // opcional
         clienteNome: financeiro.clienteNome ?? "Cliente não informado",
         valor: financeiro.valor ?? 0,
         status: financeiro.status ?? "Pago",
@@ -23,7 +18,6 @@ async create(financeiro: ICreateFinanceiro): Promise<ResponseTemplateInterface> 
         atualizadoEm: financeiro.atualizadoEm ?? new Date(),
       },
     });
-
     return {
       status: true,
       code: 201,
@@ -34,14 +28,13 @@ async create(financeiro: ICreateFinanceiro): Promise<ResponseTemplateInterface> 
     return {
       status: false,
       code: 500,
-      message: err.message.includes("agendamentoId")
-        ? err.message // mostra a mensagem clara da validação
-        : "Erro ao criar lançamento financeiro.",
+      message: "Erro ao criar lançamento financeiro.",
       data: [],
       error: err.message,
     };
   }
 }
+
 
   async getAll(): Promise<ResponseTemplateInterface> {
     try {

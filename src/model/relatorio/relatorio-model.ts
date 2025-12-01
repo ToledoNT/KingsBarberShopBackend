@@ -1,19 +1,27 @@
 import { IUpdateRelatorio } from "../../interface/relatorio/update-relatorio-interface";
 
 export class UpdateRelatorioModel {
-  mesAno: Date;           
-  agendamentos: number;   
-  faturamento: number;    
-  cancelados: number;     
-  naoCompareceu: number;  
+  mesAno: Date;
+  agendamentos: number;
+  faturamento: number;
+  cancelados: number;
+  naoCompareceu: number;
+
+  vendidos?: number;
+  consumidos?: number;
+  pendentes?: number;
+  disponiveis?: number;
 
   constructor(data: Partial<IUpdateRelatorio> & { mesAno: Date }) {
-    // mesAno vem garantido pelo type acima
     this.mesAno = data.mesAno;
-    this.agendamentos = data.agendamentos ?? 0;
-    this.faturamento = data.faturamento ?? 0;
-    this.cancelados = data.cancelados ?? 0;
-    this.naoCompareceu = data.naoCompareceu ?? 0;
+    this.agendamentos = Math.floor(data.agendamentos ?? 0);
+    this.faturamento = data.faturamento ?? 0; 
+    this.cancelados = Math.floor(data.cancelados ?? 0);
+    this.naoCompareceu = Math.floor(data.naoCompareceu ?? 0);
+
+    this.vendidos = data.vendidos !== undefined ? Math.floor(data.vendidos) : undefined;
+    this.consumidos = data.consumidos !== undefined ? Math.floor(data.consumidos) : undefined;
+    this.pendentes = data.pendentes !== undefined ? Math.floor(data.pendentes) : undefined;
   }
 
   toPayload(): IUpdateRelatorio {
@@ -23,6 +31,9 @@ export class UpdateRelatorioModel {
       faturamento: this.faturamento,
       cancelados: this.cancelados,
       naoCompareceu: this.naoCompareceu,
+      vendidos: this.vendidos,
+      consumidos: this.consumidos,
+      pendentes: this.pendentes,
     };
   }
 }

@@ -8,7 +8,9 @@ export class UpdateProdutoModel {
   estoque?: number;
   categoria?: string;
   ativo?: boolean;
-  atualizadoEm: string;
+  status?: "disponivel" | "vendido" | "consumido" | "pendente";
+  usuarioPendente?: string;
+  atualizadoEm: Date;
 
   constructor(data: IUpdateProduto) {
     this.id = data.id;
@@ -18,9 +20,10 @@ export class UpdateProdutoModel {
     this.estoque = data.estoque;
     this.categoria = data.categoria;
     this.ativo = data.ativo;
+    this.status = data.status;
+    this.usuarioPendente = data.usuarioPendente;
 
-    // sempre atualiza para agora
-    this.atualizadoEm = new Date().toISOString();
+    this.atualizadoEm = new Date();
   }
 
   toPayload(): IUpdateProduto {
@@ -32,6 +35,8 @@ export class UpdateProdutoModel {
       estoque: this.estoque,
       categoria: this.categoria,
       ativo: this.ativo,
+      status: this.status,
+      usuarioPendente: this.usuarioPendente,
       atualizadoEm: this.atualizadoEm,
     };
   }

@@ -5,12 +5,6 @@ import { ICreateProduto } from "../../interface/produtos/create-produto-interfac
 export class CreateProdutoController {
   async handle(req: Request, res: Response): Promise<void> {
     const { nome, descricao, preco, estoque, categoria } = req.body;
-
-    console.log(req.body);
-
-    // ============================
-    // Validações
-    // ============================
     if (!nome) {
       res.status(400).json({
         status: false,
@@ -49,9 +43,6 @@ export class CreateProdutoController {
 
       const produtosCriados = [];
 
-      // ============================
-      // Criar vários produtos caso a quantidade seja maior que 1
-      // ============================
       for (let i = 0; i < quantidade; i++) {
         const produto: ICreateProduto = {
           nome,

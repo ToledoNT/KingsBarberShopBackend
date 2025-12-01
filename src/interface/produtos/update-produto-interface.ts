@@ -6,5 +6,7 @@ export interface IUpdateProduto {
   estoque?: number;
   categoria?: string;
   ativo?: boolean;
-  atualizadoEm?: string;
+  status?: "disponivel" | "vendido" | "consumido" | "pendente";
+  usuarioPendente?: string;
+  atualizadoEm?: Date;
 }

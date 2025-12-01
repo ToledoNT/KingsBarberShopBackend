@@ -5,7 +5,6 @@ export class GetAllProdutosController {
   async handle(req: Request, res: Response): Promise<void> {
     const result = await new GetAllProdutosUseCase().execute();
     const produtos = result.data || [];
-
     res.status(200).json({
       status: true,
       code: 200,

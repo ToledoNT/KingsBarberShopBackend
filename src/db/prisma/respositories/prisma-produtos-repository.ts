@@ -32,38 +32,45 @@ export class PrismaProdutoRepository {
     }
   }
 
-  async update(data: IUpdateProduto): Promise<ResponseTemplateInterface> {
-    try {
-      const updateData: any = {};
+async update(data: IUpdateProduto): Promise<ResponseTemplateInterface> {
+  try {
+    const updateData: any = {};
 
-      if (data.nome !== undefined) updateData.nome = data.nome;
-      if (data.descricao !== undefined) updateData.descricao = data.descricao;
-      if (data.preco !== undefined) updateData.preco = data.preco;
-      if (data.estoque !== undefined) updateData.estoque = data.estoque; // << corrigido
-      if (data.categoria !== undefined) updateData.categoria = data.categoria;
-      if (data.ativo !== undefined) updateData.ativo = data.ativo;
-      updateData.atualizadoEm = new Date().toISOString(); // sempre atualiza
+    if (data.nome !== undefined) updateData.nome = data.nome;
+    if (data.descricao !== undefined) updateData.descricao = data.descricao;
+    if (data.preco !== undefined) updateData.preco = data.preco;
+    if (data.estoque !== undefined) updateData.estoque = data.estoque;
+    if (data.categoria !== undefined) updateData.categoria = data.categoria;
+    if (data.ativo !== undefined) updateData.ativo = data.ativo;
 
-      const produtoAtualizado = await prisma.produtos.update({
-        where: { id: data.id },
-        data: updateData,
-      });
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.usuarioPendente !== undefined) updateData.usuarioPendente = data.usuarioPendente;
 
-      return new ResponseTemplateModel(true, 200, "Produto atualizado com sucesso", produtoAtualizado);
-    } catch (error: any) {
-      console.error("Erro ao atualizar produto:", error);
+    updateData.atualizadoEm = new Date();
 
-      if (error.code === "P2002" && error.meta?.target?.includes("nome")) {
-        return new ResponseTemplateModel(false, 409, "Nome do produto já está em uso", []);
-      }
+    const produtoAtualizado = await prisma.produtos.update({
+      where: { id: data.id },
+      data: updateData,
+    });
 
-      if (error.code === "P2025") {
-        return new ResponseTemplateModel(false, 404, "Produto não encontrado para atualização", []);
-      }
+    return new ResponseTemplateModel(
+      true,
+      200,
+      "Produto atualizado com sucesso",
+      produtoAtualizado
+    );
+  } catch (error: any) {
+    console.error("Erro ao atualizar produto:", error);
 
-      return new ResponseTemplateModel(false, 500, "Erro interno ao atualizar produto", []);
+    if (error.code === "P2002" && error.meta?.target?.includes("nome")) {
+      return new ResponseTemplateModel(false, 409, "Nome do produto já está em uso", []);
     }
+    if (error.code === "P2025") {
+      return new ResponseTemplateModel(false, 404, "Produto não encontrado para atualização", []);
+    }
+    return new ResponseTemplateModel(false, 500, "Erro interno ao atualizar produto", []);
   }
+}
 
   async deleteById(id: string): Promise<ResponseTemplateInterface> {
     try {
@@ -87,29 +94,46 @@ export class PrismaProdutoRepository {
     }
   }
 
-  async getAll(): Promise<ResponseTemplateInterface> {
-    try {
-      const produtos = await prisma.produtos.findMany({
-        select: {
-          id: true,
-          nome: true,
-          descricao: true,
-          preco: true,
-          estoque: true,
-          categoria: true,
-          ativo: true,
-          criadoEm: true,
-          atualizadoEm: true,
-        },
-        orderBy: { criadoEm: "desc" },
-      });
+async getAll(): Promise<ResponseTemplateInterface> {
+  try {
+    const produtos = await prisma.produtos.findMany({
+      select: {
+        id: true,
+        nome: true,
+        descricao: true,
+        preco: true,
+        estoque: true,
+        categoria: true,
+        ativo: true,
+        status: true, 
+        usuarioPendente: true,
+        criadoEm: true,
+        atualizadoEm: true,
+      },
+      orderBy: { criadoEm: "desc" },
+    });
 
-      return new ResponseTemplateModel(true, 200, "Produtos recuperados com sucesso", produtos);
-    } catch (error: any) {
-      console.error("Erro ao recuperar produtos:", error);
-      return new ResponseTemplateModel(false, 500, "Erro interno ao recuperar produtos", []);
-    }
+    const produtosComStatus = produtos.map((p) => ({
+      ...p,
+      status: p.status || "disponivel", 
+    }));
+
+    return new ResponseTemplateModel(
+      true,
+      200,
+      "Produtos recuperados com sucesso",
+      produtosComStatus
+    );
+  } catch (error: any) {
+    console.error("Erro ao recuperar produtos:", error);
+    return new ResponseTemplateModel(
+      false,
+      500,
+      "Erro interno ao recuperar produtos",
+      []
+    );
   }
+}
 
   async getById(id: string): Promise<ResponseTemplateInterface> {
     try {

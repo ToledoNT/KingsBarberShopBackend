@@ -9,7 +9,15 @@ export class UpdateRelatorioUseCase {
     const repository = new PrismaRelatorioRepository();
 
     try {
-      const mesAnoNormalized = new Date(data.mesAno.getFullYear(), data.mesAno.getMonth(), 1, 0, 0, 0, 0);
+      const mesAnoNormalized = new Date(
+        data.mesAno.getFullYear(),
+        data.mesAno.getMonth(),
+        1,
+        0,
+        0,
+        0,
+        0
+      );
 
       const existingReport = await repository.findByMesAno(mesAnoNormalized);
 
@@ -35,6 +43,18 @@ export class UpdateRelatorioUseCase {
             data.naoCompareceu !== undefined
               ? (existingReport.data.naoCompareceu ?? 0) + data.naoCompareceu
               : existingReport.data.naoCompareceu ?? 0,
+          vendidos:
+            data.vendidos !== undefined
+              ? (existingReport.data.vendidos ?? 0) + data.vendidos
+              : existingReport.data.vendidos ?? 0,
+          consumidos:
+            data.consumidos !== undefined
+              ? (existingReport.data.consumidos ?? 0) + data.consumidos
+              : existingReport.data.consumidos ?? 0,
+          pendentes:
+            data.pendentes !== undefined
+              ? (existingReport.data.pendentes ?? 0) + data.pendentes
+              : existingReport.data.pendentes ?? 0,
         };
 
         const relatorioModel = new UpdateRelatorioModel(updatedData);

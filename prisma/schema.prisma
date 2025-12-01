@@ -1,10 +1,10 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 model Profissional {
@@ -64,7 +64,7 @@ model Agendamento {
 
 model Financeiro {
   id               String       @id @default(auto()) @map("_id") @db.ObjectId
-  agendamentoId    String       @unique @db.ObjectId
+  agendamentoId String?  @db.ObjectId      // agora opcional
   clienteNome      String
   valor            Float
   status           String       @default("Pago") 
@@ -89,25 +89,31 @@ enum Role {
 model Relatorio {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   mesAno        DateTime 
-  agendamentos  Int      @default(0)
+  agendamentos  Float    @default(0)    // antes era Int
   faturamento   Float    @default(0)
-  cancelados    Int      @default(0)
-  naoCompareceu Int      @default(0)
+  cancelados    Float    @default(0)
+  naoCompareceu Float    @default(0)
+  disponiveis   Float    @default(0)
+  vendidos      Float    @default(0)
+  consumidos    Float    @default(0)
+  pendentes     Float    @default(0)
 
   criadoEm      DateTime @default(now())
   atualizadoEm  DateTime @updatedAt
 }
 
 model Produtos {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  nome        String
-  descricao   String?
-  preco       Float
-  estoque     Int
-  categoria   String?
-  ativo       Boolean  @default(true)
-  criadoEm    DateTime @default(now())
-  atualizadoEm DateTime @updatedAt
+  id             String   @id @map("_id") @default(auto()) @db.ObjectId
+  nome           String   @unique
+  descricao      String?
+  preco          Float
+  estoque        Int?
+  categoria      String?
+  ativo          Boolean?
+  status         String?
+  usuarioPendente String?
+  criadoEm       DateTime @default(now())
+  atualizadoEm   DateTime @updatedAt
 }
 
 model Log {
