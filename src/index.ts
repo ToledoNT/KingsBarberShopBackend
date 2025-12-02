@@ -1,10 +1,11 @@
-import dotenv from "dotenv";
+import { prismaConnect } from "./db/prisma/prisma-connection";
 import server from "./server";
-
-dotenv.config();
 
 const PORT = Number(process.env.PORT) || 4001;
 
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`🔥 Servidor rodando na porta ${PORT}`);
-});
+(async () => {
+  await prismaConnect(); // espera conectar antes de subir o servidor
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`🔥 Servidor rodando na porta ${PORT}`);
+  });
+})();
