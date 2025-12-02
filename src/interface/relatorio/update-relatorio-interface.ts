@@ -4,8 +4,8 @@ export interface IUpdateRelatorio {
   faturamento?: number;
   cancelados?: number;
   naoCompareceu?: number;
-
-  vendidos?: number;       
-  consumidos?: number;     
-  pendentes?: number;      
+  vendidos?: number;
+  consumidos?: number;
+  pendentes?: number;
+  disponiveis?: number; 
 }

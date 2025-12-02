@@ -91,21 +91,47 @@ export class PrismaAppointmentRepository {
     }
   }
 
-  async getAll(): Promise<ResponseTemplateInterface> {
-    try {
-      const appointments = await prisma.agendamento.findMany({
-        orderBy: [
-          { data: "asc" },
-          { inicio: "asc" }, 
-        ],
-      });
+async getAll(): Promise<ResponseTemplateInterface> {
+  try {
+    const quatorzeDiasAtras = new Date();
+    quatorzeDiasAtras.setDate(quatorzeDiasAtras.getDate() - 14);
 
-      return new ResponseTemplateModel(true, 200, "Agendamentos recuperados com sucesso", appointments);
-    } catch (error: any) {
-      console.error("Erro ao recuperar agendamentos:", error);
-      return new ResponseTemplateModel(false, 500, "Erro interno ao recuperar agendamentos", []);
-    }
+    const appointments = await prisma.agendamento.findMany({
+      where: {
+        OR: [
+          { status: "Pendente" },
+          {
+            AND: [
+              { data: { gte: quatorzeDiasAtras } },
+              { status: "Agendado" } 
+            ]
+          },
+          {
+            AND: [
+              { data: { gte: quatorzeDiasAtras } },
+              { NOT: { status: "Pendente" } },
+              { NOT: { status: "Agendado" } } 
+            ]
+          }
+        ]
+      },
+      orderBy: [
+        { data: "asc" },
+        { inicio: "asc" }
+      ]
+    });
+
+    return new ResponseTemplateModel(
+      true,
+      200,
+      "Agendamentos recuperados com sucesso",
+      appointments
+    );
+  } catch (error: any) {
+    console.error("Erro ao recuperar agendamentos:", error);
+    return new ResponseTemplateModel(false, 500, "Erro interno ao recuperar agendamentos", []);
   }
+}
 
 async findById(id: string): Promise<ResponseTemplateInterface> {
   try {

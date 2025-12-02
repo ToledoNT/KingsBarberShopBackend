@@ -2,7 +2,6 @@ import type { Request, Response } from "express";
 import { IUpdateProduto } from "../../interface/produtos/update-produto-interface";
 import { UpdateProdutoUseCase } from "../../use-case/produtos/update-produto-use-case";
 import { CreateFinanceiroUseCase } from "../../use-case/financeiro/create-financeiro-use-case";
-import { ICreateFinanceiro } from "../../interface/financeiro/create-financeiro-interface";
 import { UpdateRelatorioUseCase } from "../../use-case/relatorio/update-relatorio-use-case";
 import { GetProdutoByIdUseCase } from "../../use-case/produtos/get-produto-by-id-controller";
 
@@ -137,7 +136,6 @@ export class UpdateProdutoController {
       }
     }
 
-    // Atualizar produto
     const dataAtualizacao: IUpdateProduto = {
       id,
       nome,

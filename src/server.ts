@@ -8,8 +8,8 @@ import ProcedimentoRoute from "./router/procedimentos-route";
 import HorarioRoute from "./router/horario-router";
 import FinanceRoute from "./router/financeiro-route";
 import RelatorioRoute from "./router/dashboard-route";
-import ProdutosRouter from "./router/produtos-router"
 import StatusRoute from "./router/status-route";
+import ProdutosRouter from "./router/produtos-router"
 
 const server = express();
 
@@ -22,16 +22,13 @@ server.use(cookieParser());
 // Função para configuração de CORS
 // =========================
 const configureCORS = () => {
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://localhost:3000",
-  "http://192.168.18.129:3000",
-  "https://192.168.18.129:3000",
-  "https://www.kingsbarber.com.br",
-  "https://kingsbarber.com.br",
-];
+  const allowedOrigins = [
+    "https://www.kingsbarber.com.br",  
+    "https://kingsbarber.com.br",      
+    "http://localhost:3000",           
+  ];
 
-return cors({
+  return cors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);  // Permite a requisição

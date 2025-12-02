@@ -1,5 +1,6 @@
 import express, { type RequestHandler } from "express";
 import { UserMiddleware } from "../middleware/user-middleware";
+import { ProdutoMiddleware } from "../middleware/produto-middleware";
 import { UserRole } from "../interface/user/create-user-interface";
 import { CreateProdutoController } from "../controller/produtos/create-produto-controller";
 import { UpdateProdutoController } from "../controller/produtos/update-produto-controller";
@@ -7,14 +8,13 @@ import { DeleteProdutoController } from "../controller/produtos/delete-produtos-
 import { GetAllProdutosController } from "../controller/produtos/get-all-produto-controller";
 import { GetProdutoByIdController } from "../controller/produtos/get-produto-bby-id-controller";
 
-
-
 const router = express.Router();
 
+// Middlewares
 const userMiddleware = new UserMiddleware();
-// const produtoMiddleware = new ProdutoMiddleware();
+const produtoMiddleware = new ProdutoMiddleware();
 
-// controllers
+// Controllers
 const createProdutoController = new CreateProdutoController();
 const updateProdutoController = new UpdateProdutoController();
 const deleteProdutoController = new DeleteProdutoController();
@@ -25,40 +25,40 @@ const getProdutoByIdController = new GetProdutoByIdController();
 const allowedRoles: UserRole[] = ["ADMIN", "BARBEIRO"];
 
 // ----------------------------------------------
-// 📌 CREATE
+// 📌 CREATE PRODUTO
 // ----------------------------------------------
 router.post(
   "/produto/create",
   userMiddleware.handleAuth.bind(userMiddleware),
   userMiddleware.authorizeRoles(...allowedRoles),
-  // produtoMiddleware.handleCreateProduto.bind(produtoMiddleware) as RequestHandler,
+  produtoMiddleware.handleCreateProduto.bind(produtoMiddleware) as RequestHandler,
   createProdutoController.handle.bind(createProdutoController) as RequestHandler
 );
 
 // ----------------------------------------------
-// 📌 UPDATE
+// 📌 UPDATE PRODUTO
 // ----------------------------------------------
 router.put(
   "/produto/update/:id",
   userMiddleware.handleAuth.bind(userMiddleware),
   userMiddleware.authorizeRoles(...allowedRoles),
-  // produtoMiddleware.handleUpdateProduto.bind(produtoMiddleware) as RequestHandler,
+  produtoMiddleware.handleUpdateProduto.bind(produtoMiddleware) as RequestHandler,
   updateProdutoController.handle.bind(updateProdutoController) as RequestHandler
 );
 
 // ----------------------------------------------
-// 📌 DELETE
+// 📌 DELETE PRODUTO
 // ----------------------------------------------
 router.delete(
   "/produto/delete/:id",
   userMiddleware.handleAuth.bind(userMiddleware),
   userMiddleware.authorizeRoles(...allowedRoles),
-  // produtoMiddleware.handleDeleteProduto.bind(produtoMiddleware) as RequestHandler,
+  produtoMiddleware.handleDeleteProduto.bind(produtoMiddleware) as RequestHandler,
   deleteProdutoController.handle.bind(deleteProdutoController) as RequestHandler
 );
 
 // ----------------------------------------------
-// 📌 GET ALL
+// 📌 GET ALL PRODUTOS
 // ----------------------------------------------
 router.get(
   "/produto/getall",
@@ -68,7 +68,7 @@ router.get(
 );
 
 // ----------------------------------------------
-// 📌 GET BY ID
+// 📌 GET PRODUTO BY ID
 // ----------------------------------------------
 router.get(
   "/produto/:id",

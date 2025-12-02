@@ -55,6 +55,10 @@ export class UpdateRelatorioUseCase {
             data.pendentes !== undefined
               ? (existingReport.data.pendentes ?? 0) + data.pendentes
               : existingReport.data.pendentes ?? 0,
+          disponiveis:
+            data.disponiveis !== undefined
+              ? (existingReport.data.disponiveis ?? 0) + data.disponiveis
+              : existingReport.data.disponiveis ?? 0,
         };
 
         const relatorioModel = new UpdateRelatorioModel(updatedData);
@@ -66,6 +70,10 @@ export class UpdateRelatorioUseCase {
           faturamento: data.faturamento ?? 0,
           cancelados: data.cancelados ?? 0,
           naoCompareceu: data.naoCompareceu ?? 0,
+          vendidos: data.vendidos ?? 0,
+          consumidos: data.consumidos ?? 0,
+          pendentes: data.pendentes ?? 0,
+          disponiveis: data.disponiveis ?? 0,
         };
 
         const relatorioModel = new UpdateRelatorioModel(newRelatorio);

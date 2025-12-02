@@ -10,7 +10,7 @@ export class UpdateRelatorioModel {
   vendidos?: number;
   consumidos?: number;
   pendentes?: number;
-  disponiveis?: number;
+  disponiveis?: number; 
 
   constructor(data: Partial<IUpdateRelatorio> & { mesAno: Date }) {
     this.mesAno = data.mesAno;
@@ -22,6 +22,7 @@ export class UpdateRelatorioModel {
     this.vendidos = data.vendidos !== undefined ? Math.floor(data.vendidos) : undefined;
     this.consumidos = data.consumidos !== undefined ? Math.floor(data.consumidos) : undefined;
     this.pendentes = data.pendentes !== undefined ? Math.floor(data.pendentes) : undefined;
+    this.disponiveis = data.disponiveis !== undefined ? Math.floor(data.disponiveis) : undefined; // ✅
   }
 
   toPayload(): IUpdateRelatorio {
@@ -34,6 +35,7 @@ export class UpdateRelatorioModel {
       vendidos: this.vendidos,
       consumidos: this.consumidos,
       pendentes: this.pendentes,
+      disponiveis: this.disponiveis, 
     };
   }
 }

@@ -111,7 +111,6 @@ export class GetDashboardMetricsController {
           dashboardData
         )
       );
-
     } catch (error: any) {
       console.error("Erro ao buscar métricas do dashboard:", error);
       res.status(500).json(

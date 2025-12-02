@@ -1,10 +1,12 @@
 import type { Request, Response } from "express";
 import { CreateProdutoUseCase } from "../../use-case/produtos/create-produto-use-case";
 import { ICreateProduto } from "../../interface/produtos/create-produto-interface";
+import { UpdateRelatorioUseCase } from "../../use-case/relatorio/update-relatorio-use-case";
 
 export class CreateProdutoController {
   async handle(req: Request, res: Response): Promise<void> {
     const { nome, descricao, preco, estoque, categoria } = req.body;
+
     if (!nome) {
       res.status(400).json({
         status: false,
@@ -36,6 +38,7 @@ export class CreateProdutoController {
     }
 
     const useCase = new CreateProdutoUseCase();
+    const updateRelatorio = new UpdateRelatorioUseCase();
 
     try {
       const agora = new Date().toISOString();
@@ -58,6 +61,19 @@ export class CreateProdutoController {
         const novoProduto = await useCase.execute(produto);
         produtosCriados.push(novoProduto);
       }
+
+      // Atualiza relatório mensal com produtos disponíveis
+      await updateRelatorio.execute({
+        mesAno: new Date(),
+        disponiveis: quantidade,
+        agendamentos: 0,
+        faturamento: 0,
+        cancelados: 0,
+        naoCompareceu: 0,
+        vendidos: 0,
+        consumidos: 0,
+        pendentes: 0,
+      });
 
       res.status(201).json({
         status: true,
