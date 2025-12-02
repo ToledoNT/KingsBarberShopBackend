@@ -10,7 +10,6 @@ RUN npm install
 
 COPY src ./src
 COPY prisma ./prisma
-COPY ssl ./ssl
 
 RUN npx prisma generate
 
