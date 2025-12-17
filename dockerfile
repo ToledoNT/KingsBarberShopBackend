@@ -6,14 +6,14 @@ COPY package*.json ./
 COPY tsconfig.json ./
 COPY .env ./
 
-# Instala todas as dependências (incluindo dev) para build
+# Instala todas as dependências (incluindo dev)
 RUN npm install
 
 COPY src ./src
 COPY prisma ./prisma
 
-# Se quiser gerar o Prisma client no build
-# RUN npx prisma generate
+# Gera Prisma Client
+RUN npx prisma generate
 
 # Build TypeScript
 RUN npm run build

@@ -96,31 +96,32 @@ async getAll(): Promise<ResponseTemplateInterface> {
     const quatorzeDiasAtras = new Date();
     quatorzeDiasAtras.setDate(quatorzeDiasAtras.getDate() - 14);
 
-    const appointments = await prisma.agendamento.findMany({
-  where: {
-    OR: [
-      { status: "Pendente" },
-      {
+    // 1️⃣ Buscar todos os pendentes
+    const pendentes = await prisma.agendamento.findMany({
+      where: { status: "Pendente" },
+      orderBy: [
+        { data: "desc" },
+        { inicio: "desc" }
+      ]
+    });
+
+    // 2️⃣ Buscar os outros agendamentos recentes
+    const outros = await prisma.agendamento.findMany({
+      where: {
         AND: [
           { data: { gte: quatorzeDiasAtras } },
-          { status: "Agendado" } 
+          { NOT: { status: "Pendente" } }
         ]
       },
-      {
-        AND: [
-          { data: { gte: quatorzeDiasAtras } },
-          { NOT: { status: "Pendente" } },
-          { NOT: { status: "Agendado" } } 
-        ]
-      }
-    ]
-  },
-  orderBy: [
-    { data: "desc" },  
-    { inicio: "desc" }
-  ],
-  take: 40 
-});
+      orderBy: [
+        { data: "desc" },
+        { inicio: "desc" }
+      ],
+      take: 40
+    });
+
+    // 3️⃣ Concatenar os resultados
+    const appointments = [...pendentes, ...outros];
 
     return new ResponseTemplateModel(
       true,
