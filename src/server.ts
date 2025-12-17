@@ -49,26 +49,15 @@ server.use(configureCORS());
 // =========================
 // Configuração das Rotas
 // =========================
-// server.use("/api", UserRoute);
-// server.use("/api", ProfissionalRoute);
-// server.use("/api", AgendamentoRoute);
-// server.use("/api", ProcedimentoRoute);
-// server.use("/api", HorarioRoute);
-// server.use("/api", FinanceRoute);
-// server.use("/api", RelatorioRoute);
-// server.use("/api", ProdutosRouter);
-// server.use("/api", StatusRoute);
-
-server.use(UserRoute);
-server.use(ProfissionalRoute);
-server.use(AgendamentoRoute);
-server.use(ProcedimentoRoute);
-server.use(HorarioRoute);
-server.use(FinanceRoute);
-server.use(RelatorioRoute);
-server.use(ProdutosRouter);
-server.use(StatusRoute);
-
+server.use("/api", UserRoute);
+server.use("/api", ProfissionalRoute);
+server.use("/api", AgendamentoRoute);
+server.use("/api", ProcedimentoRoute);
+server.use("/api", HorarioRoute);
+server.use("/api", FinanceRoute);
+server.use("/api", RelatorioRoute);
+server.use("/api", ProdutosRouter);
+server.use("/api", StatusRoute);
 
 // Rota raiz de teste para verificar se o servidor está funcionando
 server.get("/", (req: Request, res: Response) => {

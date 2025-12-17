@@ -97,29 +97,30 @@ async getAll(): Promise<ResponseTemplateInterface> {
     quatorzeDiasAtras.setDate(quatorzeDiasAtras.getDate() - 14);
 
     const appointments = await prisma.agendamento.findMany({
-      where: {
-        OR: [
-          { status: "Pendente" },
-          {
-            AND: [
-              { data: { gte: quatorzeDiasAtras } },
-              { status: "Agendado" } 
-            ]
-          },
-          {
-            AND: [
-              { data: { gte: quatorzeDiasAtras } },
-              { NOT: { status: "Pendente" } },
-              { NOT: { status: "Agendado" } } 
-            ]
-          }
+  where: {
+    OR: [
+      { status: "Pendente" },
+      {
+        AND: [
+          { data: { gte: quatorzeDiasAtras } },
+          { status: "Agendado" } 
         ]
       },
-      orderBy: [
-        { data: "asc" },
-        { inicio: "asc" }
-      ]
-    });
+      {
+        AND: [
+          { data: { gte: quatorzeDiasAtras } },
+          { NOT: { status: "Pendente" } },
+          { NOT: { status: "Agendado" } } 
+        ]
+      }
+    ]
+  },
+  orderBy: [
+    { data: "desc" },  
+    { inicio: "desc" }
+  ],
+  take: 40 
+});
 
     return new ResponseTemplateModel(
       true,
