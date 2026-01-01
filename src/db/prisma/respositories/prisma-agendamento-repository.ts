@@ -153,6 +153,6 @@ async findById(id: string): Promise<ResponseTemplateInterface> {
   } catch (error: any) {
     console.error("Erro ao buscar agendamento por ID:", error);
     return new ResponseTemplateModel(false, 500, "Erro interno ao buscar agendamento", []);
+    } 
   }
-}
 }

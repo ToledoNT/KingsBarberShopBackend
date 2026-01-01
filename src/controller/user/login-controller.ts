@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import rateLimit from "express-rate-limit"; // <- adicionado
+import rateLimit from "express-rate-limit"; 
 import { GetUserByEmailUseCase } from "../../use-case/user/get-user-by-email-use-case";
 
 export class LoginUserController {

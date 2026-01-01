@@ -10,7 +10,8 @@ async create(financeiro: ICreateFinanceiro): Promise<ResponseTemplateInterface> 
   try {
     const created = await prisma.financeiro.create({
       data: {
-        agendamentoId: financeiro.agendamentoId ?? undefined, // opcional
+        agendamentoId: financeiro.agendamentoId ?? undefined, 
+        profissionalNome: financeiro.profissionalNome ?? undefined,
         clienteNome: financeiro.clienteNome ?? "Cliente não informado",
         valor: financeiro.valor ?? 0,
         status: financeiro.status ?? "Pago",
@@ -18,6 +19,7 @@ async create(financeiro: ICreateFinanceiro): Promise<ResponseTemplateInterface> 
         atualizadoEm: financeiro.atualizadoEm ?? new Date(),
       },
     });
+
     return {
       status: true,
       code: 201,
@@ -35,8 +37,7 @@ async create(financeiro: ICreateFinanceiro): Promise<ResponseTemplateInterface> 
   }
 }
 
-
-  async getAll(): Promise<ResponseTemplateInterface> {
+async getAll(): Promise<ResponseTemplateInterface> {
     try {
       const allFinanceiro = await prisma.financeiro.findMany({
         orderBy: { criadoEm: "desc" },

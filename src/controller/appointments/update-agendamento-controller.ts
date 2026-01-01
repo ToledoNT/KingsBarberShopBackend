@@ -43,9 +43,12 @@ export class UpdateAppointmentController {
 
     if (statusProtegidos.includes(agendamento.status) && status !== agendamento.status) {
       const mensagens: Partial<Record<StatusAgendamento, string>> = {
-        [StatusAgendamento.CONCLUIDO]: "Agendamento já concluído não pode ter o status alterado",
-        [StatusAgendamento.CANCELADO]: "Agendamento cancelado não pode ter o status alterado",
-        [StatusAgendamento.NAO_COMPARECEU]: "Agendamento marcado como não compareceu não pode ter o status alterado",
+        [StatusAgendamento.CONCLUIDO]:
+          "Agendamento já concluído não pode ter o status alterado",
+        [StatusAgendamento.CANCELADO]:
+          "Agendamento cancelado não pode ter o status alterado",
+        [StatusAgendamento.NAO_COMPARECEU]:
+          "Agendamento marcado como não compareceu não pode ter o status alterado",
       };
 
       res.status(400).json({
@@ -60,28 +63,44 @@ export class UpdateAppointmentController {
     let updatedAppointment;
 
     try {
-      // Atualiza o agendamento no banco
       updatedAppointment = await new UpdateAppointmentUseCase().execute({ id, status });
 
-      // Lógica extra por status
-      if (status === StatusAgendamento.CONCLUIDO && agendamento.status !== StatusAgendamento.CONCLUIDO) {
+      if (
+        status === StatusAgendamento.CONCLUIDO &&
+        agendamento.status !== StatusAgendamento.CONCLUIDO
+      ) {
         const clienteNome = agendamento.nome ?? "Cliente não informado";
-        const valor = agendamento.servicoPreco ?? agendamento.servico?.valor ?? 0;
+        const valor =
+          agendamento.servicoPreco ??
+          agendamento.servico?.valor ??
+          0;
+
+        const profissionalId = agendamento.profissionalId;
+        const profissionalNome = agendamento.profissionalNome;
 
         await new CreateFinanceiroUseCase().execute({
           agendamentoId: agendamento.id,
           clienteNome,
           valor,
           status: StatusAgendamento.PAGO,
+          profissionalId,
+          profissionalNome,
         });
 
         await new UpdateRelatorioUseCase().execute({
-          mesAno: new Date(agendamento.criadoEm.getFullYear(), agendamento.criadoEm.getMonth(), 1),
+          mesAno: new Date(
+            agendamento.criadoEm.getFullYear(),
+            agendamento.criadoEm.getMonth(),
+            1
+          ),
           faturamento: valor,
         });
       }
 
-      if (status === StatusAgendamento.CANCELADO && agendamento.status !== StatusAgendamento.CANCELADO) {
+      if (
+        status === StatusAgendamento.CANCELADO &&
+        agendamento.status !== StatusAgendamento.CANCELADO
+      ) {
         const horarioParaCriar: ICreateHorario = {
           profissionalId: agendamento.profissionalId,
           data: agendamento.data,
@@ -92,21 +111,33 @@ export class UpdateAppointmentController {
 
         await new CreateHorarioUseCase().execute(horarioParaCriar);
 
-        const mesAno = new Date(agendamento.criadoEm.getFullYear(), agendamento.criadoEm.getMonth(), 1);
+        const mesAno = new Date(
+          agendamento.criadoEm.getFullYear(),
+          agendamento.criadoEm.getMonth(),
+          1
+        );
+
         await new UpdateRelatorioUseCase().execute({
           mesAno,
           cancelados: 1,
         });
       }
 
-      if (status === StatusAgendamento.NAO_COMPARECEU && agendamento.status !== StatusAgendamento.NAO_COMPARECEU) {
-        const mesAno = new Date(agendamento.criadoEm.getFullYear(), agendamento.criadoEm.getMonth(), 1);
+      if (
+        status === StatusAgendamento.NAO_COMPARECEU &&
+        agendamento.status !== StatusAgendamento.NAO_COMPARECEU
+      ) {
+        const mesAno = new Date(
+          agendamento.criadoEm.getFullYear(),
+          agendamento.criadoEm.getMonth(),
+          1
+        );
+
         await new UpdateRelatorioUseCase().execute({
           mesAno,
           naoCompareceu: 1,
         });
       }
-
     } catch (err) {
       console.error("Erro ao atualizar agendamento ou processar lógica extra:", err);
       res.status(500).json({
