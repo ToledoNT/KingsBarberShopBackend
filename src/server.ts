@@ -9,7 +9,7 @@ import HorarioRoute from "./router/horario-router";
 import FinanceRoute from "./router/financeiro-route";
 import RelatorioRoute from "./router/dashboard-route";
 import StatusRoute from "./router/status-route";
-import ProdutosRouter from "./router/produtos-router"
+import ProdutosRouter from "./router/produtos-router";
 
 const server = express();
 
@@ -22,11 +22,11 @@ server.use(cookieParser());
 // Função para configuração de CORS
 // =========================
 const configureCORS = () => {
-  const allowedOrigins = [
+const allowedOrigins = [
     "https://www.kingsbarber.com.br",  
     "https://kingsbarber.com.br",      
-    "http://localhost:3000",           
-  ];
+  "http://localhost:3000",
+];
 
   return cors({
     origin: (origin, callback) => {
@@ -37,7 +37,7 @@ const configureCORS = () => {
         callback(new Error("Não autorizado pela política de CORS"));  
       }
     },
-    credentials: true,  
+    credentials: true,
   });
 };
 

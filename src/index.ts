@@ -7,5 +7,5 @@ const PORT = Number(process.env.PORT) || 4001;
   await prismaConnect(); // espera conectar antes de subir o servidor
   server.listen(PORT, "0.0.0.0", () => {
     console.log(`🔥 Servidor rodando na porta ${PORT}`);
-  });
+    });
 })();

@@ -8,6 +8,7 @@ export class GetAllFinanceiroController {
     const result = await new GetAllFinanceiroUseCase().execute();
     const financeiroList = result.data || [];
     const produtosResult = await new GetAllProdutosUseCase().execute();
+    
     const produtos = produtosResult.data || [];
 
     const pendentes = produtos.filter((p: any) => p.status === "pendente");

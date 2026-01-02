@@ -32,7 +32,6 @@ export class UpdateAppointmentController {
       });
       return;
     }
-
     const agendamento = appointmentResponse.data;
 
     const statusProtegidos = [
